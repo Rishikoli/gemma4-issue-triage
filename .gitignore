@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Competition data, derived labels, downloaded runs and generated notebooks: never committed
+/data
+results/
+notebooks/gemma4-repro-check/

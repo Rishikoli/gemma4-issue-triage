@@ -41,8 +41,8 @@ next runs, with the orchestrator frozen, are its clean test. Regenerate the figu
 | `agent/` | The triage agent: config, prompt, sampling, per-issue budget (24 tool calls, 8 minutes) |
 | `triage/` | Deterministic steps around the agents: retrieval (BM25 + call-graph spreading), agreement-based confidence, call-graph test finder, a reproduction check that re-runs the script, the report writer (`python -m triage.orchestrate`) |
 | `tests/` | Self-contained tests (`python -m pytest tests`) |
-| `notebooks/` | Runnable demo |
-| `eval/` | Rebuild labels from the competition data and score reports |
+| `notebooks/` | Runnable demo (coming) |
+| `eval/` | Rebuild the labels, baselines and every number in the paper from the competition data ([eval/README.md](eval/README.md)) |
 | `adapters/` | LoRA adapters (planned) |
 | `docs/` | Architecture, figures, example reports |
 
