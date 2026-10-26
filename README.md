@@ -30,7 +30,8 @@ the fix wrong surprisingly often, and their own tests rarely notice.
 | Path | What |
 |---|---|
 | `agent/` | The triage agent: config, prompt, sampling, per-issue budget (24 tool calls, 8 minutes) |
-| `triage/` | Deterministic steps: call-graph test finder, agreement-based confidence |
+| `triage/` | Deterministic steps around the agents: retrieval (BM25 + call-graph spreading), agreement-based confidence, call-graph test finder, a reproduction check that re-runs the script, the report writer (`python -m triage.orchestrate`) |
+| `tests/` | Self-contained tests (`python -m pytest tests`) |
 | `notebooks/` | Runnable demo |
 | `eval/` | Rebuild labels from the competition data and score reports |
 | `adapters/` | LoRA adapters (planned) |
