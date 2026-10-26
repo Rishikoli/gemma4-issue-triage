@@ -13,6 +13,10 @@ Gemma 4 agent and the repository's code graph, then hands the report to the main
 confidence level. It writes no fix: in our measurements, agents that find the right file still get
 the fix wrong surprisingly often, and their own tests rarely notice.
 
+## Example
+
+<p align="center"><img src="docs/hero.png" alt="FastAPI issue 14458: Gemma 4's triage report points to fastapi/dependencies/models.py, lists tests/test_dependency_class.py and includes a failing reproduction; the merged fix changed that file, added tests there, and makes the reproduction pass." width="100%"></p>
+
 ## What you get per issue
 
 - **Suspected location**: ranked files and functions, with evidence

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Triage example: FastAPI #14458</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ffffff; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #111827; }
+  .frame { width: 1600px; padding: 40px 48px 32px; }
+  h1 { font-size: 30px; margin: 0 0 4px; }
+  .sub { font-size: 16px; color: #4b5563; margin: 0 0 26px; }
+  .cols { display: grid; grid-template-columns: 1fr 52px 1.25fr 52px 1fr; align-items: stretch; }
+  .card { border-radius: 16px; padding: 22px 24px; border: 1.6px solid; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .issue { background: #f8fafc; border-color: #94a3b8; }
+  .report { background: #eef2ff; border-color: #6366f1; }
+  .truth { background: #ecfdf5; border-color: #10b981; }
+  .tag { font-size: 12px; font-weight: 700; letter-spacing: .05em; }
+  .issue .tag { color: #64748b; } .report .tag { color: #4f46e5; } .truth .tag { color: #059669; }
+  h2 { font-size: 21px; margin: 0; line-height: 1.25; }
+  p, li { font-size: 15.5px; line-height: 1.45; margin: 0; }
+  .muted { color: #4b5563; }
+  code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; }
+  .k { font-size: 13px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: .04em; margin-top: 4px; }
+  .box { background: #ffffff; border-radius: 10px; padding: 10px 12px; border: 1px solid #e5e7eb; }
+  .err { color: #b91c1c; }
+  .ok { color: #047857; }
+  .pill { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 14px; font-weight: 700; background: #dcfce7; color: #166534; }
+  .arrow { display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 34px; }
+  ul { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .check { font-weight: 700; color: #059669; margin-right: 6px; }
+  .foot { font-size: 13.5px; color: #6b7280; margin-top: 18px; }
+</style></head>
+<body><div class="frame">
+  <h1>One issue, triaged offline by Gemma 4</h1>
+  <p class="sub">Before a maintainer looks: where the bug is, which tests cover it, and a script that reproduces it. No fix is written.</p>
+  <div class="cols">
+    <div class="card issue">
+      <div class="tag">THE ISSUE · FASTAPI #14458 (PUBLIC)</div>
+      <h2>Class dependency with <code>__call__</code> treated as a coroutine</h2>
+      <p class="muted">“FastAPI 0.123.6 introduced a regression — if we use class (not instance) as dependency and this class has <code>__call__</code> method that is coroutine or generator, it is mistakenly treated as coroutine/generator.”</p>
+      <p class="muted">It names three helper functions, but not the file they live in.</p>
+      <p class="mono muted" style="margin-top:auto">github.com/fastapi/fastapi/pull/14458</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card report">
+      <div class="tag">TRIAGE REPORT · GEMMA 4 31B · OFFLINE · UNDER 8 MIN</div>
+      <div><span class="pill">HIGH confidence</span> <span class="muted" style="font-size:14px">agent and retrieval agree</span></div>
+      <div class="k">Suspected location</div>
+      <div class="box mono">fastapi/dependencies/models.py ::<br>Dependant.is_coroutine_callable (+ 2 siblings)</div>
+      <p class="muted" style="font-size:14.5px">“checks <code>__call__</code> of the callable without verifying if it's a class”</p>
+      <div class="k">Tests to run</div>
+      <div class="box mono">tests/test_dependency_class.py</div>
+      <div class="k">Reproduction · TRIAGE/repro.py</div>
+      <div class="box mono">AsyncCallDep: is_coroutine=True<br><span class="err">AssertionError: AsyncCallDep should not be is_coroutine_callable</span></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card truth">
+      <div class="tag">WHAT THE MAINTAINERS DID</div>
+      <h2>Checked against the merged fix</h2>
+      <ul>
+        <li><span class="check">✓</span>Fixed in <code>fastapi/dependencies/models.py</code>, the file the report ranked first</li>
+        <li><span class="check">✓</span>New tests added to <code>tests/test_dependency_class.py</code>, the test file the report listed</li>
+        <li><span class="check">✓</span>The report's script <b>fails</b> on the original code and <b class="ok">passes</b> once the fix is applied (we ran both)</li>
+      </ul>
+      <p class="muted" style="margin-top:auto">The maintainer gets a located, reproduced bug and the tests to run, and still writes the fix.</p>
+    </div>
+  </div>
+  <p class="foot">Gemma 4 31B (4-bit) served with vLLM on 4× L4, fully offline · 24 tool calls / 8 minutes per issue · read-only except a TRIAGE/ folder · confidence from agreement with BM25 + call-graph retrieval.</p>
+</div></body></html>
