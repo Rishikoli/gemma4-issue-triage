@@ -45,6 +45,7 @@ kaggle kernels push -p notebooks/gemma4-repro-check            # CPU notebook, n
 kaggle kernels output <kaggle_user>/gemma4-repro-check -p results/repro_check
 python eval/triage_pipeline.py triage_dev_r1 triage_hold_r1    # orchestrator: reports + summary.jsonl
 python eval/paper_stats.py                                     # leakage split, McNemar tests, fallbacks
+python eval/check_package.py                                   # the shipped triage/ package gives the same reports
 ```
 
 The repro check runs every `TRIAGE/repro.py` before and after the reference fix. It uses the same

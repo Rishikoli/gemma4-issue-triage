@@ -26,7 +26,8 @@ def triage(workspace: Path, issue_text: str, graph: CodeGraph, opened_files: lis
         suspects, source = opened_files, "files the agent opened (no report written)"
     else:
         suspects, source = retrieval, "retrieval only (agent wrote nothing)"
-    conf = confidence(suspects[0] if suspects and source == "agent report" else None, retrieval)
+    # The agent's pick, from its report or what it opened first, against retrieval; retrieval alone is LOW
+    conf = confidence(suspects[0] if suspects and retrieval is not suspects else None, retrieval)
     tests = findings.tests + [m for m in (graph.test_modules_calling({suspects[0]}) if suspects else [])
                               if m not in findings.tests]
     status, tail = check_reproduction(workspace) if run_repro else (findings.claimed_repro or "NOT_ATTEMPTED", "")

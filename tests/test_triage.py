@@ -11,6 +11,7 @@ from triage.trace import opened_modules
 
 def tiny_graph(tmp: Path) -> CodeGraph:
     g = {"nodes": [{"name": "pkg.parser.parse_header", "text": "def parse_header(value): split charset"},
+                   {"name": "pkg.client.Client", "text": "class Client: ..."},
                    {"name": "pkg.client.Client.send", "text": "def send(self): retry timeout"},
                    {"name": "tests.test_parser.test_parse_header", "text": "def test_parse_header(): ..."}],
          "edges": [{"type": "calls", "source": "tests.test_parser.test_parse_header", "target": "pkg.parser.parse_header"}]}
@@ -57,4 +58,7 @@ def test_fallback_to_opened_files():
         _, info = triage(ws, "parse_header splits the charset wrongly", tiny_graph(ws),
                          opened_files=opened_modules(trace), run_repro=False)
         assert info["suspects"][:2] == ["pkg.client", "pkg.parser"]
-        assert info["confidence"] == "LOW"                  # not an agent report → never HIGH
+        assert info["confidence"] == "LOW"                  # retrieval ranks pkg.parser first
+        _, info = triage(ws, "Client.send ignores the retry timeout", tiny_graph(ws),
+                         opened_files=opened_modules(trace), run_repro=False)
+        assert info["confidence"] == "HIGH"                 # what the agent opened first agrees with retrieval
