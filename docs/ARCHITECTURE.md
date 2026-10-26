@@ -4,6 +4,10 @@ Offline issue triage with Gemma 4: when a new issue arrives, answer the maintain
 questions (where is it, which tests cover it, can it be reproduced) before a human looks, on one
 machine, without writing a fix.
 
+<img src="architecture.svg" alt="Architecture diagram (animated)" width="100%">
+
+Static version for slides and the paper: [architecture.png](architecture.png).
+
 ```
  GitHub issue
      │

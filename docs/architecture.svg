@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 780" width="1000" height="780" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Gemma 4 Issue Triage architecture</title>
+  <desc id="d">A GitHub issue goes to a Gemma 4 localizer agent and to CPU retrieval; their agreement sets the confidence; a Gemma 4 reproducer agent and a call-graph test finder run next; a template writes the report; the maintainer approves high-confidence reports, reviews low-confidence ones, and can send a hint back to the agents.</desc>
+  <style>
+    .llm  { fill: #eef2ff; stroke: #6366f1; }
+    .cpu  { fill: #ecfdf5; stroke: #10b981; }
+    .tpl  { fill: #f8fafc; stroke: #94a3b8; }
+    .hum  { fill: #fffbeb; stroke: #f59e0b; }
+    .box  { stroke-width: 1.6; }
+    .h    { font-size: 15px; font-weight: 650; fill: #111827; }
+    .s    { font-size: 12px; fill: #4b5563; }
+    .tag  { font-size: 10.5px; font-weight: 600; letter-spacing: .04em; }
+    .tag-llm { fill: #4f46e5; } .tag-cpu { fill: #059669; } .tag-hum { fill: #b45309; } .tag-tpl { fill: #64748b; }
+    .wire { fill: none; stroke: #9ca3af; stroke-width: 1.6; }
+    .loop { fill: none; stroke: #f59e0b; stroke-width: 1.8; stroke-dasharray: 7 6; animation: flow 1.2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -26; } }
+    .chip { animation: pulse 3.6s ease-in-out infinite; }
+    .c2 { animation-delay: 1.2s; } .c3 { animation-delay: 2.4s; }
+    @keyframes pulse { 0%, 100% { opacity: .45; } 15%, 35% { opacity: 1; } }
+    .dot-llm { fill: #6366f1; } .dot-cpu { fill: #10b981; } .dot-tpl { fill: #64748b; }
+    @media (prefers-reduced-motion: reduce) { .loop, .chip { animation: none; } .chip { opacity: 1; } circle { display: none; } }
+  </style>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arrh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#f59e0b"/>
+    </marker>
+    <!-- data paths (reused by the moving dots) -->
+    <path id="p-in-l"  d="M500 112 V146 H275 V180"/>
+    <path id="p-in-r"  d="M500 112 V146 H725 V180"/>
+    <path id="p-l-ag"  d="M275 262 V284 H440 V306"/>
+    <path id="p-r-ag"  d="M725 262 V284 H560 V306"/>
+    <path id="p-ag-rp" d="M500 380 V398 H275 V418"/>
+    <path id="p-ag-tf" d="M500 380 V398 H725 V418"/>
+    <path id="p-rp-wr" d="M275 500 V516 H440 V534"/>
+    <path id="p-tf-wr" d="M725 500 V516 H560 V534"/>
+    <path id="p-wr-hu" d="M500 588 V636"/>
+  </defs>
+
+  <rect x="1" y="1" width="998" height="778" rx="18" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="32" y="40" font-size="20" font-weight="700" fill="#111827">Gemma 4 Issue Triage</text>
+  <text x="32" y="62" class="s">Offline · never edits code · a maintainer makes the final call</text>
+
+  <!-- issue -->
+  <rect x="400" y="62" width="200" height="50" rx="10" class="box tpl"/>
+  <text x="500" y="84" text-anchor="middle" class="h">New GitHub issue</text>
+  <text x="500" y="102" text-anchor="middle" class="s">issue text only</text>
+
+  <!-- orchestrator frame -->
+  <rect x="40" y="132" width="920" height="470" rx="16" fill="none" stroke="#cbd5e1" stroke-dasharray="6 5"/>
+  <text x="942" y="590" text-anchor="end" class="tag tag-tpl">ORCHESTRATOR · PYTHON, DETERMINISTIC</text>
+
+  <!-- wires -->
+  <use href="#p-in-l" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-in-r" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-l-ag" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-r-ag" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-ag-rp" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-ag-tf" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-rp-wr" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-tf-wr" class="wire" marker-end="url(#arr)"/>
+  <use href="#p-wr-hu" class="wire" marker-end="url(#arr)"/>
+
+  <!-- 1 localizer -->
+  <rect x="110" y="180" width="330" height="82" rx="12" class="box llm"/>
+  <text x="128" y="202" class="tag tag-llm">GEMMA 4 AGENT</text>
+  <text x="128" y="226" class="h">① Localizer</text>
+  <text x="128" y="246" class="s">read-only search and reads → ranked suspects</text>
+
+  <!-- 2 retrieval -->
+  <rect x="560" y="180" width="330" height="82" rx="12" class="box cpu"/>
+  <text x="578" y="202" class="tag tag-cpu">CPU · NO MODEL</text>
+  <text x="578" y="226" class="h">② Retrieval</text>
+  <text x="578" y="246" class="s">BM25 + call-graph spreading over the code graph</text>
+
+  <!-- 3 agreement -->
+  <rect x="320" y="306" width="360" height="74" rx="12" class="box cpu"/>
+  <text x="338" y="328" class="tag tag-cpu">CPU · NO MODEL</text>
+  <text x="338" y="350" class="h">③ Agreement → confidence</text>
+  <g font-size="11.5" font-weight="650">
+    <g class="chip"><rect x="338" y="357" width="96" height="18" rx="9" fill="#dcfce7"/><text x="386" y="370" text-anchor="middle" fill="#166534">HIGH · 98%</text></g>
+    <g class="chip c2"><rect x="442" y="357" width="110" height="18" rx="9" fill="#fef9c3"/><text x="497" y="370" text-anchor="middle" fill="#854d0e">MEDIUM · 86%</text></g>
+    <g class="chip c3"><rect x="560" y="357" width="96" height="18" rx="9" fill="#fee2e2"/><text x="608" y="370" text-anchor="middle" fill="#991b1b">LOW · 59%</text></g>
+  </g>
+
+  <!-- 4 reproducer -->
+  <rect x="110" y="418" width="330" height="82" rx="12" class="box llm"/>
+  <text x="128" y="440" class="tag tag-llm">GEMMA 4 AGENT · FRESH CONTEXT</text>
+  <text x="128" y="464" class="h">④ Reproducer</text>
+  <text x="128" y="484" class="s">writes and runs TRIAGE/repro.py · reproduced or not</text>
+
+  <!-- 5 test finder -->
+  <rect x="560" y="418" width="330" height="82" rx="12" class="box cpu"/>
+  <text x="578" y="440" class="tag tag-cpu">CPU · NO MODEL</text>
+  <text x="578" y="464" class="h">⑤ Test finder</text>
+  <text x="578" y="484" class="s">tests that call the suspect code (call graph)</text>
+
+  <!-- 6 report writer -->
+  <rect x="320" y="534" width="360" height="54" rx="12" class="box tpl"/>
+  <text x="338" y="556" class="tag tag-tpl">TEMPLATE</text>
+  <text x="338" y="577" class="h">⑥ Report → report.md</text>
+
+  <!-- 7 human -->
+  <rect x="270" y="636" width="460" height="112" rx="14" class="box hum"/>
+  <text x="290" y="658" class="tag tag-hum">HUMAN IN THE LOOP</text>
+  <text x="290" y="682" class="h">⑦ Maintainer</text>
+  <text x="290" y="704" class="s">HIGH → draft comment to approve or edit</text>
+  <text x="290" y="722" class="s">LOW / not reproduced → review queue, with the agent's open questions</text>
+  <text x="290" y="740" class="s">answer → re-run ① and ④ with the hint</text>
+
+  <!-- feedback loop -->
+  <path d="M270 700 H70 V459 H104" class="loop" marker-end="url(#arrh)"/>
+  <path d="M70 459 V221 H104" class="loop" marker-end="url(#arrh)"/>
+  <text x="92" y="622" class="tag tag-hum" transform="rotate(-90 92 622)">MAINTAINER'S HINT</text>
+
+  <!-- moving dots: one pass through the pipeline every 6 s -->
+  <circle r="5" class="dot-llm"><animateMotion dur="1s" begin="0s;loop.end+0.4s" fill="freeze" id="d1"><mpath href="#p-in-l"/></animateMotion></circle>
+  <circle r="5" class="dot-cpu"><animateMotion dur="1s" begin="d1.begin" fill="freeze"><mpath href="#p-in-r"/></animateMotion></circle>
+  <circle r="5" class="dot-llm"><animateMotion dur="0.9s" begin="d1.end+0.3s" fill="freeze" id="d2"><mpath href="#p-l-ag"/></animateMotion></circle>
+  <circle r="5" class="dot-cpu"><animateMotion dur="0.9s" begin="d2.begin" fill="freeze"><mpath href="#p-r-ag"/></animateMotion></circle>
+  <circle r="5" class="dot-llm"><animateMotion dur="0.9s" begin="d2.end+0.3s" fill="freeze" id="d3"><mpath href="#p-ag-rp"/></animateMotion></circle>
+  <circle r="5" class="dot-cpu"><animateMotion dur="0.9s" begin="d3.begin" fill="freeze"><mpath href="#p-ag-tf"/></animateMotion></circle>
+  <circle r="5" class="dot-llm"><animateMotion dur="0.8s" begin="d3.end+0.3s" fill="freeze" id="d4"><mpath href="#p-rp-wr"/></animateMotion></circle>
+  <circle r="5" class="dot-cpu"><animateMotion dur="0.8s" begin="d4.begin" fill="freeze"><mpath href="#p-tf-wr"/></animateMotion></circle>
+  <circle r="5" class="dot-tpl"><animateMotion dur="0.7s" begin="d4.end+0.2s" fill="freeze" id="loop"><mpath href="#p-wr-hu"/></animateMotion></circle>
+
+  <!-- legend -->
+  <g font-size="11.5" fill="#374151">
+    <rect x="770" y="660" width="14" height="14" rx="3" class="llm" stroke-width="1.4"/><text x="792" y="672">Gemma 4 agent</text>
+    <rect x="770" y="684" width="14" height="14" rx="3" class="cpu" stroke-width="1.4"/><text x="792" y="696">Deterministic, CPU</text>
+    <rect x="770" y="708" width="14" height="14" rx="3" class="hum" stroke-width="1.4"/><text x="792" y="720">Human decision</text>
+  </g>
+</svg>
