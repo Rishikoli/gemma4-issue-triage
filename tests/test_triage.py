@@ -6,6 +6,7 @@ from pathlib import Path
 from triage.graph import CodeGraph, node_module, path_to_module
 from triage.orchestrate import triage
 from triage.report import confidence
+from triage.trace import opened_modules
 
 
 def tiny_graph(tmp: Path) -> CodeGraph:
@@ -42,3 +43,18 @@ def test_end_to_end_without_agent_report():
         assert info["tests"] == ["tests.test_parser"]       # found through the call edge
         assert info["reproduction"] == "REPRODUCED"         # the script fails on the current code
         assert "## Tests to run" in report
+
+
+def test_fallback_to_opened_files():
+    calls = [("write_file", "/workspace/TRIAGE/repro.py"), ("read_file", "/workspace/tests/test_client.py"),
+             ("read_file", "/workspace/src/pkg/client.py"), ("read_file", "pkg/parser.py"),
+             ("read_file", "/workspace/src/pkg/client.py")]
+    trace = {"steps": [{"source": "agent", "tool_calls": [{"function_name": f, "arguments": {"filepath": p}}]}
+                       for f, p in calls]}
+    assert opened_modules(trace) == ["pkg.client", "pkg.parser"]   # no notes, no tests, no repeats
+    with tempfile.TemporaryDirectory() as d:
+        ws = Path(d)
+        _, info = triage(ws, "parse_header splits the charset wrongly", tiny_graph(ws),
+                         opened_files=opened_modules(trace), run_repro=False)
+        assert info["suspects"][:2] == ["pkg.client", "pkg.parser"]
+        assert info["confidence"] == "LOW"                  # not an agent report → never HIGH

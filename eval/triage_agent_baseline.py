@@ -43,7 +43,7 @@ def agent_rankings(trace: dict) -> tuple[list[str], list[str], str | None]:
             name, args = c.get("function_name"), c.get("arguments") or {}
             if name in ("read_file", "edit_file", "write_file") and args.get("filepath"):
                 p = norm(str(args["filepath"]))
-                if p.startswith("tmp/"):
+                if p.startswith(("tmp/", "TRIAGE/")):  # scratch files and the triage agent's own notes
                     continue
                 if TEST_PATH.search(p):
                     m = test_module(p)
