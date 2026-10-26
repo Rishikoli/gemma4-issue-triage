@@ -21,8 +21,10 @@ the fix wrong surprisingly often, and their own tests rarely notice.
 
 <p align="center"><img src="docs/results.png" alt="Top-1 accuracy. Finding the file to fix: BM25 38% dev / 25% holdout, the harness code-search tool 28/40, BM25 with embeddings 28/30, BM25 with call-graph spreading 42/30, the Gemma 4 triage agent 75/55, agent plus orchestrator 92/90. Finding the test file: BM25 22/50, agent 48/25, agent plus orchestrator with call-graph tests 65/55." width="100%"></p>
 
-Gemma 4 31B on 40 dev and 20 holdout issues from the competition's repositories. The holdout issues were
-never used for design. Regenerate the figure with `python docs/make_results_chart.py`.
+Gemma 4 31B, one run on 40 dev and 20 holdout issues from the competition's repositories. The agent's
+prompt was written from dev issues only; the orchestrator's rules were chosen after this run, so the
+next runs, with the orchestrator frozen, are its clean test. Regenerate the figure with
+`python docs/make_results_chart.py`.
 
 ## What you get per issue
 

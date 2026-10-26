@@ -69,7 +69,7 @@ h1 {{ font-size:26px; margin:0 0 4px; }} .sub {{ font-size:15px; color:var(--tex
 <h1>Gemma 4 finds the bug; the code graph helps it find the tests</h1>
 <p class="sub">Top-1 accuracy on the same issues for every method (Gemma 4 31B, offline). The orchestrator adds model-free steps around the agent.</p>
 <div class="legend"><span><span class="sw" style="background:var(--series-1)"></span>Dev · 40 issues</span>
-<span><span class="sw" style="background:var(--series-2)"></span>Holdout · 20 issues, never used for design</span></div>
+<span><span class="sw" style="background:var(--series-2)"></span>Holdout · 20 issues</span></div>
 <div class="panels">{''.join(panel(t, r) for t, r in DATA.items())}</div>
 <p class="foot">"Gemma 4 triage agent" counts a missing report as a miss; the orchestrator always writes one (falling back to the files the agent opened)
 and merges in tests that call the suspected code. Ground truth: the files and test files changed by the merged fix.</p>
