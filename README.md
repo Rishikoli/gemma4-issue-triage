@@ -2,7 +2,7 @@
 
 **Locate the bug, find the tests, reproduce it — offline, before a human looks. Never auto-fix.**
 
-> Work in progress for the Gemma 4 Developer Agent Paper Track. Demo, results and a runnable notebook
+> Work in progress for the Gemma 4 Developer Agent Paper Track. A demo and a runnable notebook
 > are coming; see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
 
 <p align="center"><img src="docs/architecture.svg" alt="Architecture: a Gemma 4 localizer and CPU retrieval agree on a confidence level; a Gemma 4 reproducer and a call-graph test finder follow; a template writes the report; the maintainer decides." width="100%"></p>
@@ -16,6 +16,13 @@ the fix wrong surprisingly often, and their own tests rarely notice.
 ## Example
 
 <p align="center"><img src="docs/hero.png" alt="FastAPI issue 14458: Gemma 4's triage report points to fastapi/dependencies/models.py, lists tests/test_dependency_class.py and includes a failing reproduction; the merged fix changed that file, added tests there, and makes the reproduction pass." width="100%"></p>
+
+## Results so far
+
+<p align="center"><img src="docs/results.png" alt="Top-1 accuracy. Finding the file to fix: BM25 38% dev / 25% holdout, the harness code-search tool 28/40, BM25 with embeddings 28/30, BM25 with call-graph spreading 42/30, the Gemma 4 triage agent 75/55, agent plus orchestrator 92/90. Finding the test file: BM25 22/50, agent 48/25, agent plus orchestrator with call-graph tests 65/55." width="100%"></p>
+
+Gemma 4 31B on 40 dev and 20 holdout issues from the competition's repositories. The holdout issues were
+never used for design. Regenerate the figure with `python docs/make_results_chart.py`.
 
 ## What you get per issue
 

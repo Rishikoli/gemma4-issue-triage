@@ -1,0 +1,92 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Triage results</title><style>
+.viz-root { --surface-1:#fcfcfb; --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#76756f;
+  --grid:#e7e6e2; --series-1:#2a78d6; --series-2:#eb6834; color-scheme: light; }
+body { margin:0; background:var(--surface-1); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.viz-root { width:1600px; padding:36px 44px 28px; box-sizing:border-box; background:var(--surface-1); color:var(--text-primary); }
+h1 { font-size:26px; margin:0 0 4px; } .sub { font-size:15px; color:var(--text-secondary); margin:0 0 14px; }
+.legend { display:flex; gap:22px; font-size:14px; color:var(--text-secondary); margin-bottom:12px; }
+.sw { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:7px; vertical-align:-1px; }
+.panels { display:flex; gap:36px; align-items:flex-start; } svg { display:block; flex:none; }
+.pt { font-size:17px; font-weight:650; fill:var(--text-primary); }
+.lab { font-size:14px; fill:var(--text-secondary); } .lab.ours { fill:var(--text-primary); font-weight:650; }
+.val { font-size:12.5px; fill:var(--text-secondary); } .tick { font-size:12px; fill:var(--text-muted); }
+.grid { stroke:var(--grid); stroke-width:1; } .s1 { fill:var(--series-1); } .s2 { fill:var(--series-2); }
+.foot { font-size:13px; color:var(--text-muted); margin-top:6px; }
+</style></head><body><div class="viz-root">
+<h1>Gemma 4 finds the bug; the code graph helps it find the tests</h1>
+<p class="sub">Top-1 accuracy on the same issues for every method (Gemma 4 31B, offline). The orchestrator adds model-free steps around the agent.</p>
+<div class="legend"><span><span class="sw" style="background:var(--series-1)"></span>Dev · 40 issues</span>
+<span><span class="sw" style="background:var(--series-2)"></span>Holdout · 20 issues, never used for design</span></div>
+<div class="panels"><svg viewBox="0 0 738 390" width="738" height="390" role="img" aria-label="Finding the file to fix">
+<text x="0" y="22" class="pt">Finding the file to fix</text>
+<line x1="250.0" x2="250.0" y1="40" y2="368" class="grid"/>
+<text x="250.0" y="384" class="tick" text-anchor="middle">0%</text>
+<line x1="355.0" x2="355.0" y1="40" y2="368" class="grid"/>
+<text x="355.0" y="384" class="tick" text-anchor="middle">25%</text>
+<line x1="460.0" x2="460.0" y1="40" y2="368" class="grid"/>
+<text x="460.0" y="384" class="tick" text-anchor="middle">50%</text>
+<line x1="565.0" x2="565.0" y1="40" y2="368" class="grid"/>
+<text x="565.0" y="384" class="tick" text-anchor="middle">75%</text>
+<line x1="670.0" x2="670.0" y1="40" y2="368" class="grid"/>
+<text x="670.0" y="384" class="tick" text-anchor="middle">100%</text>
+<text x="236" y="66" class="lab" text-anchor="end">BM25 over the code</text>
+<path d="M250 46 H405.6 Q409.6 46 409.6 50 V58 Q409.6 62 405.6 62 H250 Z" class="s1"/>
+<text x="415.6" y="58" class="val">38%</text>
+<path d="M250 64 H351.0 Q355.0 64 355.0 68 V76 Q355.0 80 351.0 80 H250 Z" class="s2"/>
+<text x="361.0" y="76" class="val">25%</text>
+<text x="236" y="118" class="lab" text-anchor="end">Agent's code-search tool</text>
+<path d="M250 98 H363.6 Q367.6 98 367.6 102 V110 Q367.6 114 363.6 114 H250 Z" class="s1"/>
+<text x="373.6" y="110" class="val">28%</text>
+<path d="M250 116 H414.0 Q418.0 116 418.0 120 V128 Q418.0 132 414.0 132 H250 Z" class="s2"/>
+<text x="424.0" y="128" class="val">40%</text>
+<text x="236" y="170" class="lab" text-anchor="end">BM25 + embedding neighbours</text>
+<path d="M250 150 H363.6 Q367.6 150 367.6 154 V162 Q367.6 166 363.6 166 H250 Z" class="s1"/>
+<text x="373.6" y="162" class="val">28%</text>
+<path d="M250 168 H372.0 Q376.0 168 376.0 172 V180 Q376.0 184 372.0 184 H250 Z" class="s2"/>
+<text x="382.0" y="180" class="val">30%</text>
+<text x="236" y="222" class="lab" text-anchor="end">BM25 + call-graph spreading</text>
+<path d="M250 202 H422.4 Q426.4 202 426.4 206 V214 Q426.4 218 422.4 218 H250 Z" class="s1"/>
+<text x="432.4" y="214" class="val">42%</text>
+<path d="M250 220 H372.0 Q376.0 220 376.0 224 V232 Q376.0 236 372.0 236 H250 Z" class="s2"/>
+<text x="382.0" y="232" class="val">30%</text>
+<text x="236" y="274" class="lab" text-anchor="end">Gemma 4 triage agent</text>
+<path d="M250 254 H561.0 Q565.0 254 565.0 258 V266 Q565.0 270 561.0 270 H250 Z" class="s1"/>
+<text x="571.0" y="266" class="val">75%</text>
+<path d="M250 272 H477.0 Q481.0 272 481.0 276 V284 Q481.0 288 477.0 288 H250 Z" class="s2"/>
+<text x="487.0" y="284" class="val">55%</text>
+<text x="236" y="326" class="lab ours" text-anchor="end">+ orchestrator</text>
+<path d="M250 306 H632.4 Q636.4 306 636.4 310 V318 Q636.4 322 632.4 322 H250 Z" class="s1"/>
+<text x="642.4" y="318" class="val">92%</text>
+<path d="M250 324 H624.0 Q628.0 324 628.0 328 V336 Q628.0 340 624.0 340 H250 Z" class="s2"/>
+<text x="634.0" y="336" class="val">90%</text>
+</svg><svg viewBox="0 0 738 234" width="738" height="234" role="img" aria-label="Finding the test file the fix's tests go in">
+<text x="0" y="22" class="pt">Finding the test file the fix's tests go in</text>
+<line x1="250.0" x2="250.0" y1="40" y2="212" class="grid"/>
+<text x="250.0" y="228" class="tick" text-anchor="middle">0%</text>
+<line x1="355.0" x2="355.0" y1="40" y2="212" class="grid"/>
+<text x="355.0" y="228" class="tick" text-anchor="middle">25%</text>
+<line x1="460.0" x2="460.0" y1="40" y2="212" class="grid"/>
+<text x="460.0" y="228" class="tick" text-anchor="middle">50%</text>
+<line x1="565.0" x2="565.0" y1="40" y2="212" class="grid"/>
+<text x="565.0" y="228" class="tick" text-anchor="middle">75%</text>
+<line x1="670.0" x2="670.0" y1="40" y2="212" class="grid"/>
+<text x="670.0" y="228" class="tick" text-anchor="middle">100%</text>
+<text x="236" y="66" class="lab" text-anchor="end">BM25 over the test files</text>
+<path d="M250 46 H338.4 Q342.4 46 342.4 50 V58 Q342.4 62 338.4 62 H250 Z" class="s1"/>
+<text x="348.4" y="58" class="val">22%</text>
+<path d="M250 64 H456.0 Q460.0 64 460.0 68 V76 Q460.0 80 456.0 80 H250 Z" class="s2"/>
+<text x="466.0" y="76" class="val">50%</text>
+<text x="236" y="118" class="lab" text-anchor="end">Gemma 4 triage agent</text>
+<path d="M250 98 H447.6 Q451.6 98 451.6 102 V110 Q451.6 114 447.6 114 H250 Z" class="s1"/>
+<text x="457.6" y="110" class="val">48%</text>
+<path d="M250 116 H351.0 Q355.0 116 355.0 120 V128 Q355.0 132 351.0 132 H250 Z" class="s2"/>
+<text x="361.0" y="128" class="val">25%</text>
+<text x="236" y="170" class="lab ours" text-anchor="end">+ orchestrator (call-graph tests)</text>
+<path d="M250 150 H519.0 Q523.0 150 523.0 154 V162 Q523.0 166 519.0 166 H250 Z" class="s1"/>
+<text x="529.0" y="162" class="val">65%</text>
+<path d="M250 168 H477.0 Q481.0 168 481.0 172 V180 Q481.0 184 477.0 184 H250 Z" class="s2"/>
+<text x="487.0" y="180" class="val">55%</text>
+</svg></div>
+<p class="foot">"Gemma 4 triage agent" counts a missing report as a miss; the orchestrator always writes one (falling back to the files the agent opened)
+and merges in tests that call the suspected code. Ground truth: the files and test files changed by the merged fix.</p>
+</div></body></html>
