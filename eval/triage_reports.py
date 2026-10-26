@@ -2,7 +2,7 @@
 """Score the triage agent's reports (Paper 2). CPU only.
 
 Reads each task's saved patch from a triage run (results/<run>/results/<run>/patches/<id>.patch),
-extracts TRIAGE/report.md and TRIAGE/repro.py, and scores the report against the labels from
+extracts TRIAGE/report.md (or the multi-agent TRIAGE/locations.md + repro.md) and TRIAGE/repro.py, and scores the report against the labels from
 eval/triage_labels.py:
 
   location     hit@1/@3: a suspected file is a file the reference fix changes (module level)
@@ -110,7 +110,9 @@ def main() -> None:
                 continue
             pf = d / "patches" / f"{tid}.patch"
             files = files_in_patch(pf.read_text(errors="replace")) if pf.exists() else {}
-            report = files.get("TRIAGE/report.md", "")
+            # single agent: report.md; localizer → reproducer: locations.md + repro.md
+            report = files.get("TRIAGE/report.md") or "\n".join(
+                files[f] for f in ("TRIAGE/locations.md", "TRIAGE/repro.md") if files.get(f))
             parsed = parse_report(report) if report else {"locations": [], "tests": [], "repro": None, "confidence": None}
             gold = set(lab["gold_modules"])
             gold_tests = {m for p in lab["gold_test_files"] if (m := test_module(p))}

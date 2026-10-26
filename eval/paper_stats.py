@@ -7,9 +7,11 @@
   - repro scripts that pass on the buggy code but print a different result once fixed
 
 Usage: python eval/triage_pipeline.py triage_dev_r1 triage_hold_r1 && python eval/paper_stats.py
+       [--dev RUN] [--holdout RUN] [--repro-check results/repro_check/repro_check.jsonl]
 """
 from __future__ import annotations
 
+import argparse
 import json
 import re
 from collections import defaultdict
@@ -19,7 +21,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"  # the competition data: tasks.jsonl, graphs/, embeddings/ (not redistributed)
 TRIAGE = ROOT / "results" / "triage"
-RUNS = {"triage_dev_r1": "dev", "triage_hold_r1": "holdout"}
 
 
 def jsonl(path: Path) -> list[dict]:
@@ -46,6 +47,12 @@ def mcnemar(a: list[bool], b: list[bool]) -> tuple[int, int, float]:
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--dev", default="triage_dev_r1")
+    ap.add_argument("--holdout", default="triage_hold_r1")
+    ap.add_argument("--repro-check", type=Path, default=ROOT / "results" / "repro_check" / "repro_check.jsonl")
+    args = ap.parse_args()
+    RUNS = {args.dev: "dev", args.holdout: "holdout"}
     tasks = {t["instance_id"]: t for t in jsonl(DATA / "tasks.jsonl")}
     labels = {l["task_id"]: l for l in jsonl(TRIAGE / "labels.jsonl")}
     pipe = {(r["run"], r["task_id"]): r for r in jsonl(TRIAGE / "pipeline" / "summary.jsonl")}
@@ -86,7 +93,7 @@ def main() -> None:
         by[pipe[k]["source"]][1] += pipe[k]["loc_rank"] == 1
     print("\nOrchestrated location by suspect source:", {s: f"{c}/{n}" for s, (n, c) in by.items()})
 
-    checks = jsonl(ROOT / "results" / "repro_check" / "repro_check.jsonl")
+    checks = [c for c in jsonl(args.repro_check) if c["run"] in RUNS] if args.repro_check.exists() else []
     def norm(s: str | None) -> str:
         return re.sub(r"0x[0-9a-f]+|\d+\.\d+s|/tmp/\S+", "", s or "").strip()
     passes = [c for c in checks if c["verdict"] == "passes_before"]
