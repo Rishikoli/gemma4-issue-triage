@@ -6,8 +6,9 @@ machine, without writing a fix.
 
 <img src="architecture.svg" alt="Animated architecture: one Gemma 4 triage agent investigates the issue and writes notes, a reproduction script and a trace; a deterministic orchestrator checks them in five steps and fills the final report for the maintainer, who can add a hint and re-run." width="100%">
 
-The figure plays the story of one issue once, stage by stage, then keeps particles flowing along every
-connection. Each check feeds one field of the report. For places that don't play SVG animation (slides,
+The figure is a sequential infographic of one issue: on a 10.5 s loop the arrows fire in the order data
+moves (issue → agent → reads → handoff → call edges → checks → report fields → maintainer → hint), each
+lighting the card it feeds. Each check feeds one field of the report. For places that don't play SVG animation (slides,
 the Kaggle writeup): [architecture.gif](architecture.gif), and a static [architecture.png](architecture.png).
 All three come from [make_architecture.py](make_architecture.py) (`--gif` for the GIF). Blue marks
 Gemma 4, orange marks deterministic code, and the gradient marks where the two meet.
