@@ -5,7 +5,7 @@
 > Work in progress for the Gemma 4 Developer Agent Paper Track. A demo and a runnable notebook
 > are coming; see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
 
-<p align="center"><img src="docs/architecture.svg" alt="Architecture: a Gemma 4 localizer and CPU retrieval agree on a confidence level; a Gemma 4 reproducer and a call-graph test finder follow; a template writes the report; the maintainer decides." width="100%"></p>
+<p align="center"><img src="docs/architecture.svg" alt="Animated architecture: one offline Gemma 4 triage agent investigates the issue and writes notes, a reproduction script and a trace; a deterministic orchestrator checks them in five steps (fallback, retrieval, agreement confidence, call-graph tests, re-running the reproduction) and fills the report the maintainer decides on." width="100%"></p>
 
 When a new issue is filed, a maintainer's first hour goes to three questions: *where in the code is
 it, which tests cover that code, and can I reproduce it?* This tool answers them with an offline
