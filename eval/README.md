@@ -63,6 +63,7 @@ snapshots.
 | Table 2 | `triage_localize.py` (`test_selection`), `triage_reports.py`, `triage_pipeline.py` (`test_rank`) |
 | §4.4 reproduction verdicts and precision | `results/repro_check/repro_check.jsonl`; `triage_pipeline.py` prints both precisions |
 | §4.5 confidence on triage reports | `triage_pipeline.py` (confidence → location hit@1) |
+| §4.6 one agent vs localizer → reproducer | `paper_stats.py --compare <other pipeline summary.jsonl> --compare-runs <dev run> <holdout run>` |
 
 `triage_agent_baseline.py` computes the same localization and test metrics from any run's traces
 (the order in which the agent opened files). We used it on earlier fixing-agent runs.

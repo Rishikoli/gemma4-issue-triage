@@ -8,6 +8,7 @@
 
 Usage: python eval/triage_pipeline.py triage_dev_r1 triage_hold_r1 && python eval/paper_stats.py
        [--dev RUN] [--holdout RUN] [--repro-check results/repro_check/repro_check.jsonl]
+       [--compare results/triage/pipeline_multi/summary.jsonl --compare-runs DEV_RUN HOLDOUT_RUN]
 """
 from __future__ import annotations
 
@@ -51,6 +52,8 @@ def main() -> None:
     ap.add_argument("--dev", default="triage_dev_r1")
     ap.add_argument("--holdout", default="triage_hold_r1")
     ap.add_argument("--repro-check", type=Path, default=ROOT / "results" / "repro_check" / "repro_check.jsonl")
+    ap.add_argument("--compare", type=Path, help="another system's pipeline summary.jsonl, for paired tests")
+    ap.add_argument("--compare-runs", nargs=2, metavar=("DEV_RUN", "HOLDOUT_RUN"))
     args = ap.parse_args()
     RUNS = {args.dev: "dev", args.holdout: "holdout"}
     tasks = {t["instance_id"]: t for t in jsonl(DATA / "tasks.jsonl")}
@@ -100,6 +103,19 @@ def main() -> None:
     changed = [c["task_id"] for c in passes if norm(c["out_before"]) != norm(c["out_after"])]
     print(f"\nRepro scripts passing on the buggy code: {len(passes)}; output changes with the fix: {len(changed)}")
     print("  ", ", ".join(changed))
+
+    if args.compare:  # same issues, another system (e.g. localizer -> reproducer)
+        other = {r["task_id"]: r for r in jsonl(args.compare) if r["run"] in args.compare_runs}
+        other_raw = {r["task_id"]: r for run in args.compare_runs for r in jsonl(TRIAGE / f"reports_{run}.jsonl")}
+        ids = [k for k in keys if k[1] in other]
+        print(f"\nPaired with {args.compare_runs} on {len(ids)} issues (this system right & other wrong, the reverse, p):")
+        for name, a, b in (
+                ("location, agent", [raw[k].get("loc_rank") == 1 for k in ids], [other_raw[k[1]].get("loc_rank") == 1 for k in ids]),
+                ("location, + orchestrator", [pipe[k]["loc_rank"] == 1 for k in ids], [other[k[1]]["loc_rank"] == 1 for k in ids]),
+                ("tests, agent", [raw[k].get("test_rank") == 1 for k in ids], [other_raw[k[1]].get("test_rank") == 1 for k in ids]),
+                ("tests, + orchestrator", [pipe[k]["test_rank"] == 1 for k in ids], [other[k[1]]["test_rank"] == 1 for k in ids])):
+            x, y, p = mcnemar(a, b)
+            print(f"  {name:26s} {sum(a)}/{len(a)} vs {sum(b)}/{len(b)}: {x} / {y}, p = {p:.2g}")
 
 
 if __name__ == "__main__":
