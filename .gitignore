@@ -224,3 +224,4 @@ __marimo__/
 results/
 notebooks/gemma4-repro-check/
 notebooks/triage-demo*/
+notebooks/gemma4-ast-graphs/

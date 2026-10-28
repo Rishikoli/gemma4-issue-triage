@@ -3,6 +3,7 @@ import json
 import tempfile
 from pathlib import Path
 
+from triage.build_graph import build_graph
 from triage.graph import CodeGraph, node_module, path_to_module
 from triage.orchestrate import triage
 from triage.report import confidence
@@ -44,6 +45,24 @@ def test_end_to_end_without_agent_report():
         assert info["tests"] == ["tests.test_parser"]       # found through the call edge
         assert info["reproduction"] == "REPRODUCED"         # the script fails on the current code
         assert "## Tests to run" in report
+
+
+def test_build_graph_follows_reexports():
+    with tempfile.TemporaryDirectory() as d:
+        repo = Path(d)
+        (repo / "src" / "pkg").mkdir(parents=True)
+        (repo / "tests").mkdir()
+        (repo / "src" / "pkg" / "__init__.py").write_text("from .parser import parse_header\n")
+        (repo / "src" / "pkg" / "parser.py").write_text(
+            "def split(v):\n    return v.split(';')\n\n"
+            "def parse_header(v):\n    return split(v)\n")
+        (repo / "tests" / "test_parser.py").write_text(
+            "from pkg import parse_header\n\ndef test_it():\n    assert parse_header('a;b')\n")
+        (repo / "g.json").write_text(json.dumps(build_graph(repo, "pkg")))
+        g = CodeGraph.load(repo / "g.json")
+        assert ("pkg.parser.parse_header", "pkg.parser.split") in g.edges          # same-module call
+        assert ("tests.test_parser.test_it", "pkg.parser.parse_header") in g.edges  # through the package re-export
+        assert g.test_modules_calling({"pkg.parser"}) == ["tests.test_parser"]
 
 
 def test_fallback_to_opened_files():

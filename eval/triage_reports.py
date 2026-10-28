@@ -30,6 +30,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from triage_labels import TEST_PATH, to_module  # noqa: E402
 from triage_localize import is_test_module, node_module  # noqa: E402
 
+GRAPHS = DATA / "graphs"  # code graphs; --graphs swaps in another set (e.g. our own, eval/make_graphs_notebook.py)
+
 
 def files_in_patch(patch: str) -> dict[str, str]:
     """path -> added text for every file in a unified diff (full text for newly created files)."""
@@ -78,7 +80,7 @@ def parse_report(report: str) -> dict:
 
 
 def graph_tests(task: dict, module: str) -> list[str]:
-    g = json.loads((DATA / "graphs" / f"{task['repo'].split('/')[-1]}_{task['base_commit']}.json").read_text())
+    g = json.loads((GRAPHS / f"{task['repo'].split('/')[-1]}_{task['base_commit']}.json").read_text())
     names = {n["name"] for n in g["nodes"]}
     mod_of = {n: node_module(n, names) for n in names}
     c = Counter(mod_of[e["source"]] for e in g["edges"] if e["source"] in names and e["target"] in names
@@ -96,7 +98,9 @@ def main() -> None:
     ap.add_argument("--labels", type=Path, default=ROOT / "results" / "triage" / "labels.jsonl")
     ap.add_argument("--sound-only", action="store_true")
     ap.add_argument("--out", type=Path, default=ROOT / "results" / "triage" / "reports.jsonl")
+    ap.add_argument("--graphs", type=Path, default=GRAPHS)
     args = ap.parse_args()
+    globals()["GRAPHS"] = args.graphs
     labels = {l["task_id"]: l for l in map(json.loads, args.labels.read_text().splitlines()) if l}
     tasks = {t["instance_id"]: t for t in map(json.loads, (DATA / "tasks.jsonl").read_text().splitlines())}
 

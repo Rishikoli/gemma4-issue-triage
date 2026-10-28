@@ -30,6 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"  # the competition data: tasks.jsonl, graphs/, embeddings/ (not redistributed)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from triage_agent_baseline import agent_rankings  # noqa: E402
+import triage_reports  # noqa: E402
 from triage_reports import files_in_patch, graph_tests, parse_report, rank_of, section, test_module  # noqa: E402
 
 
@@ -70,7 +71,9 @@ def main() -> None:
     ap.add_argument("--retrieval", nargs="+", default=sorted(glob.glob(str(ROOT / "results/triage/localize_*_all.jsonl"))))
     ap.add_argument("--out-dir", type=Path, default=ROOT / "results" / "triage" / "pipeline")
     ap.add_argument("--repro-check", type=Path, default=ROOT / "results" / "repro_check" / "repro_check.jsonl")
+    ap.add_argument("--graphs", type=Path, default=triage_reports.GRAPHS, help="code graphs for call-graph tests")
     args = ap.parse_args()
+    triage_reports.GRAPHS = args.graphs
     labels = {l["task_id"]: l for l in map(json.loads, args.labels.read_text().splitlines()) if l}
     tasks = {t["instance_id"]: t for t in map(json.loads, (DATA / "tasks.jsonl").read_text().splitlines())}
     retr = {}

@@ -39,7 +39,7 @@ next runs, with the orchestrator frozen, are its clean test. Regenerate the figu
 | Path | What |
 |---|---|
 | `agent/` | The triage agent: config, prompt, sampling, per-issue budget (24 tool calls, 8 minutes) |
-| `triage/` | Deterministic steps around the agents: retrieval (BM25 + call-graph spreading), agreement-based confidence, call-graph test finder, a reproduction check that re-runs the script, the report writer (`python -m triage.orchestrate`) |
+| `triage/` | Deterministic steps around the agents: retrieval (BM25 + call-graph spreading), agreement-based confidence, call-graph test finder, a reproduction check that re-runs the script, the report writer (`python -m triage.orchestrate`), and a code-graph builder for any Python repository (`python -m triage.build_graph`) |
 | `tests/` | Self-contained tests (`python -m pytest tests`) |
 | `notebooks/` | `make_demo_notebook.py`: a Kaggle notebook that triages real issues end to end with Gemma 4 and prints the maintainer's reports |
 | `eval/` | Rebuild the labels, baselines and every number in the paper from the competition data ([eval/README.md](eval/README.md)) |
