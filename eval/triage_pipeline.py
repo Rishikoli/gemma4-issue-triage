@@ -72,10 +72,11 @@ def main() -> None:
     ap.add_argument("--out-dir", type=Path, default=ROOT / "results" / "triage" / "pipeline")
     ap.add_argument("--repro-check", type=Path, default=ROOT / "results" / "repro_check" / "repro_check.jsonl")
     ap.add_argument("--graphs", type=Path, default=triage_reports.GRAPHS, help="code graphs for call-graph tests")
+    ap.add_argument("--tasks", type=Path, default=DATA / "tasks.jsonl")
     args = ap.parse_args()
     triage_reports.GRAPHS = args.graphs
     labels = {l["task_id"]: l for l in map(json.loads, args.labels.read_text().splitlines()) if l}
-    tasks = {t["instance_id"]: t for t in map(json.loads, (DATA / "tasks.jsonl").read_text().splitlines())}
+    tasks = {t["instance_id"]: t for t in map(json.loads, args.tasks.read_text().splitlines()) if t}
     retr = {}
     for f in args.retrieval:
         for r in map(json.loads, Path(f).read_text().splitlines()):

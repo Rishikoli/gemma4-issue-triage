@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import warnings
 from collections import defaultdict
 from pathlib import Path
 
@@ -96,7 +97,10 @@ def build_graph(root: str | Path, repo_name: str | None = None) -> dict:
             continue
         try:
             source = p.read_text(encoding="utf-8", errors="replace")
-            modules.append(_Module(name, p, source, ast.parse(source)))
+            with warnings.catch_warnings():  # test data often has invalid escape sequences
+                warnings.simplefilter("ignore")
+                tree = ast.parse(source)
+            modules.append(_Module(name, p, source, tree))
         except (SyntaxError, ValueError):
             continue
     nodes: dict[str, str] = {}

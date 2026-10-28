@@ -225,3 +225,4 @@ results/
 notebooks/gemma4-repro-check/
 notebooks/triage-demo*/
 notebooks/gemma4-ast-graphs/
+notebooks/gemma4-ext-tasks/

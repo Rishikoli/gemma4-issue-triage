@@ -99,10 +99,11 @@ def main() -> None:
     ap.add_argument("--sound-only", action="store_true")
     ap.add_argument("--out", type=Path, default=ROOT / "results" / "triage" / "reports.jsonl")
     ap.add_argument("--graphs", type=Path, default=GRAPHS)
+    ap.add_argument("--tasks", type=Path, default=DATA / "tasks.jsonl")
     args = ap.parse_args()
     globals()["GRAPHS"] = args.graphs
     labels = {l["task_id"]: l for l in map(json.loads, args.labels.read_text().splitlines()) if l}
-    tasks = {t["instance_id"]: t for t in map(json.loads, (DATA / "tasks.jsonl").read_text().splitlines())}
+    tasks = {t["instance_id"]: t for t in map(json.loads, args.tasks.read_text().splitlines()) if t}
 
     rows = []
     for run in args.runs:
