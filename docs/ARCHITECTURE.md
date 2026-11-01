@@ -24,7 +24,7 @@ Gemma 4, orange marks deterministic code, and the gradient marks where the two m
 | 4 Call-graph tests | Code graph | Test files whose functions call the suspected module, merged with the agent's | Right test file first: 48% · 25% → 65% · 55% |
 | 5 Reproduction check | Runs `TRIAGE/repro.py` | Non-zero exit on the current code means REPRODUCED, whatever the agent claimed | "Reproduced" right 61% of the time vs 44% for the agent's own claim |
 | Report | Template | Location, confidence and why, tests, reproduction output, open questions | Nothing in it is generated freely |
-| Maintainer | Human | HIGH: approve; LOW: check first; disagree: add a hint to the issue and re-run | The tool never edits code (0 of 60 runs touched source files) |
+| Maintainer | Human | HIGH: approve; LOW: check first; disagree: add a hint to the issue and re-run | The agent edited source code in 0 of 60 first-run issues and once in 150 single-agent runs overall: mount the source read-only |
 
 ## What we tried and dropped
 

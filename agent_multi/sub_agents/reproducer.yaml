@@ -1,0 +1,13 @@
+name: reproducer
+description: Reproduces the issue and finds the covering tests, starting from the localizer's summary.
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/reproducer.md
+include_contents: none            # fresh context: the issue and the localizer's summary only
+tools:
+  - run_command
+  - read_file
+  - write_file
+  - get_status
+  - get_code_neighbors
+  - submit_patch
+generate_content_config: !include ../configs/sampling.yaml

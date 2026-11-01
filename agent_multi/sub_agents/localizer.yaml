@@ -1,0 +1,11 @@
+name: localizer
+description: Finds where the reported problem lives and writes TRIAGE/locations.md. Never edits code.
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/localizer.md
+output_key: localization          # the reproducer reads this as {localization?}
+tools:
+  - run_command
+  - read_file
+  - write_file
+  - get_status
+generate_content_config: !include ../configs/sampling.yaml

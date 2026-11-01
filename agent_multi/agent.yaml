@@ -1,0 +1,9 @@
+# Multi-agent triage (Paper 2): localizer → reproducer in a fixed order; the final report.md is
+# assembled afterwards by the deterministic orchestrator (eval/triage_pipeline.py), together with
+# retrieval, agreement-based confidence and call-graph test finding. Agents never edit source code.
+name: triage_pipeline
+agent_class: SequentialAgent
+description: Locate the bug, then reproduce it and find tests; never fix.
+sub_agents:
+  - config_path: sub_agents/localizer.yaml
+  - config_path: sub_agents/reproducer.yaml

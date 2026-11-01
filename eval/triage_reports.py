@@ -11,7 +11,8 @@ eval/triage_labels.py:
                step, no model): test modules that call into it, merged after the agent's own list
   confidence   location hit@1 by self-reported HIGH / MEDIUM / LOW
   reproduction self-reported status (verified separately by running repro.py before/after the fix)
-  violations   tasks whose patch touches anything outside TRIAGE/
+  violations   tasks whose patch touches anything outside TRIAGE/; of those, tasks that changed or deleted
+               a file that already existed (not just new scratch files)
 
 Usage: python eval/triage_reports.py triage_r1 [triage_r2 ...] [--sound-only]
 """
@@ -48,6 +49,16 @@ def files_in_patch(patch: str) -> dict[str, str]:
         elif current and line.startswith("+") and not line.startswith("+++"):
             out[current].append(line[1:])
     return {p: "\n".join(lines) for p, lines in out.items()}
+
+
+def modified_existing(patch: str) -> list[str]:
+    """Files outside TRIAGE/ that existed before the run and were changed or deleted (not files it created)."""
+    out = []
+    for block in re.split(r"^diff --git ", patch, flags=re.M)[1:]:
+        m = re.match(r"a/(\S+) b/(\S+)", block)
+        if m and not m.group(2).startswith("TRIAGE/") and "new file mode" not in block.split("\n@@", 1)[0]:
+            out.append(m.group(2))
+    return sorted(out)
 
 
 def section(report: str, title: str) -> str:
@@ -114,7 +125,8 @@ def main() -> None:
             if not lab or (args.sound_only and not lab["sound"]):
                 continue
             pf = d / "patches" / f"{tid}.patch"
-            files = files_in_patch(pf.read_text(errors="replace")) if pf.exists() else {}
+            patch = pf.read_text(errors="replace") if pf.exists() else ""
+            files = files_in_patch(patch)
             # single agent: report.md; localizer → reproducer: locations.md + repro.md
             report = files.get("TRIAGE/report.md") or "\n".join(
                 files[f] for f in ("TRIAGE/locations.md", "TRIAGE/repro.md") if files.get(f))
@@ -126,6 +138,7 @@ def main() -> None:
             rows.append({
                 "run": run, "task_id": tid, "has_report": bool(report), "has_repro": "TRIAGE/repro.py" in files,
                 "violation": sorted(p for p in files if not p.startswith("TRIAGE/")),
+                "modified_existing": modified_existing(patch),
                 **parsed, "loc_rank": rank_of(parsed["locations"], gold),
                 "test_rank": rank_of(parsed["tests"], gold_tests),
                 "graph_test_rank": rank_of(g_tests, gold_tests), "merged_test_rank": rank_of(merged, gold_tests)})
@@ -138,7 +151,8 @@ def main() -> None:
     def hit(key, k): return sum(1 for r in rows if r[key] and r[key] <= k) / n
     print(f"{n} task-runs from {args.runs}{' (sound only)' if args.sound_only else ''}")
     print(f"  reports written {sum(r['has_report'] for r in rows)}/{n}, repro scripts {sum(r['has_repro'] for r in rows)}/{n}, "
-          f"edits outside TRIAGE/ {sum(bool(r['violation']) for r in rows)}/{n}")
+          f"edits outside TRIAGE/ {sum(bool(r['violation']) for r in rows)}/{n} "
+          f"(existing files modified {sum(bool(r['modified_existing']) for r in rows)}/{n})")
     print(f"  {'':22s} {'hit@1':>6s} {'hit@3':>6s}")
     for name, key in (("location", "loc_rank"), ("tests (agent)", "test_rank"),
                       ("tests (graph step)", "graph_test_rank"), ("tests (agent+graph)", "merged_test_rank")):
