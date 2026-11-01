@@ -262,7 +262,7 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
     (out / f"{args.slug}.ipynb").write_text(json.dumps(nb, indent=1) + "\n", encoding="utf-8")
     meta = {"id": f"{args.owner}/{args.slug}", "title": args.slug, "code_file": f"{args.slug}.ipynb",
-            "language": "python", "kernel_type": "notebook", "is_private": True, "enable_gpu": True,
+            "language": "python", "kernel_type": "notebook", "is_private": False, "enable_gpu": True,
             "enable_tpu": False, "enable_internet": False,
             "dataset_sources": ["metric/gemma-4-developer-agent-wheelhouse"],
             "competition_sources": ["gemma-4-developer-agent"], "kernel_sources": [],
