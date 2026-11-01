@@ -3,8 +3,9 @@
 
   - localization by whether the issue text names the file to fix (leakage control)
   - exact McNemar tests on the pooled dev + holdout issues
-  - how often the fallback (first file the agent opened) was right
+  - how often the fallback (first file the agent opened) was right, and retrieval on the same issues
   - repro scripts that pass on the buggy code but print a different result once fixed
+  - source modules per repository; embedding vs call-edge neighbours of retrieval's top functions
 
 Usage: python eval/triage_pipeline.py triage_dev_r1 triage_hold_r1 && python eval/paper_stats.py
        [--dev RUN] [--holdout RUN] [--repro-check results/repro_check/repro_check.jsonl]
@@ -15,6 +16,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import statistics
+import sys
 from collections import defaultdict
 from math import comb
 from pathlib import Path
@@ -22,6 +25,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"  # the competition data: tasks.jsonl, graphs/, embeddings/ (not redistributed)
 TRIAGE = ROOT / "results" / "triage"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from triage_localize import BM25, is_test_module, node_module, tokens  # noqa: E402
 
 
 def jsonl(path: Path) -> list[dict]:
@@ -45,6 +50,46 @@ def mcnemar(a: list[bool], b: list[bool]) -> tuple[int, int, float]:
     n = x + y
     p = min(1.0, 2 * sum(comb(n, i) for i in range(min(x, y) + 1)) / 2 ** n) if n else 1.0
     return x, y, p
+
+
+def graph_neighbours(ids: list[str], tasks: dict, labels: dict) -> None:
+    """Repository size, and where the neighbours of BM25's top-3 functions lead: the 20 nearest by the
+    organizers' embeddings vs call-graph edges (same module as the function; from a wrong module into
+    the right one)."""
+    import numpy as np
+    size = defaultdict(list)
+    count = {"embedding": [0, 0, 0], "call": [0, 0, 0]}  # neighbours, same module, wrong -> right module
+    for t in ids:
+        task = tasks[t]; short = task["repo"].split("/")[-1]; name = f"{short}_{task['base_commit']}"
+        g = json.loads((DATA / "graphs" / f"{name}.json").read_text())
+        text = {n["name"]: (n.get("text") or "") for n in g["nodes"]}
+        mod = {n: node_module(n, set(text)) for n in text}
+        src = {n for n in text if not is_test_module(mod[n])}
+        size[short].append(len({mod[n] for n in src}))
+        gold = set(labels[t]["gold_modules"])
+        scores = BM25({n: tokens(n) + tokens(text[n]) for n in src}).scores(tokens(task["problem_statement"]))
+        top = sorted(scores, key=lambda n: -scores[n])[:3]
+        calls = defaultdict(set)
+        for e in g["edges"]:
+            if e["source"] in src and e["target"] in src:
+                calls[e["source"]].add(e["target"]); calls[e["target"]].add(e["source"])
+        z = np.load(DATA / "embeddings" / f"{name}.npz", allow_pickle=True)
+        keys = [k for k in z.files if k in src]
+        mat = np.stack([z[k] for k in keys]).astype("float32")
+        mat /= np.linalg.norm(mat, axis=1, keepdims=True) + 1e-9
+        for n in top:
+            near = {"call": calls[n], "embedding": []}
+            if n in keys:
+                near["embedding"] = [keys[i] for i in np.argsort(-(mat @ mat[keys.index(n)]))[1:21]]
+            for kind, ms in near.items():
+                for m in ms:
+                    c = count[kind]
+                    c[0] += 1; c[1] += mod[m] == mod[n]; c[2] += mod[m] in gold and mod[n] not in gold
+    print("\nSource modules per repository snapshot (median, range):",
+          {r: f"{statistics.median(v):g} ({min(v)}-{max(v)})" for r, v in size.items()})
+    print("Neighbours of BM25's top-3 functions (same module; leading from a wrong module into the right one):")
+    for kind, (n, same, into) in count.items():
+        print(f"  {kind:9s} {n:4d}: same module {same / n:.0%}, wrong -> right module {into / n:.1%}")
 
 
 def main() -> None:
@@ -95,6 +140,9 @@ def main() -> None:
         by[pipe[k]["source"]][0] += 1
         by[pipe[k]["source"]][1] += pipe[k]["loc_rank"] == 1
     print("\nOrchestrated location by suspect source:", {s: f"{c}/{n}" for s, (n, c) in by.items()})
+    fb = [k for k in keys if pipe[k]["source"] == "files the agent opened"]
+    print(f"  on those {len(fb)} fallback issues retrieval (BM25 + call graph) is right on "
+          f"{sum(retr[k[1]]['bm25_calls']['rank'] == 1 for k in fb)}")
 
     checks = [c for c in jsonl(args.repro_check) if c["run"] in RUNS] if args.repro_check.exists() else []
     def norm(s: str | None) -> str:
@@ -103,6 +151,10 @@ def main() -> None:
     changed = [c["task_id"] for c in passes if norm(c["out_before"]) != norm(c["out_after"])]
     print(f"\nRepro scripts passing on the buggy code: {len(passes)}; output changes with the fix: {len(changed)}")
     print("  ", ", ".join(changed))
+    inverted = [c["task_id"] for c in passes if re.search(r"reproduc\w* failed", c["out_after"] or "", re.I)]
+    print(f"   of which print 'Reproduction failed' once fixed (an output check would read them backwards): {inverted}")
+
+    graph_neighbours(sorted({k[1] for k in keys}), tasks, labels)
 
     if args.compare:  # same issues, another system (e.g. localizer -> reproducer)
         other = {r["task_id"]: r for r in jsonl(args.compare) if r["run"] in args.compare_runs}
