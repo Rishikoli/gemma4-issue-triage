@@ -6,6 +6,7 @@
 > See it run: the Kaggle notebook [triage-demo](https://www.kaggle.com/code/rishikeshbharatkoli/triage-demo)
 > triages three real issues end to end and prints the reports. Design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 > Deploying it: [the Triage Playbook](docs/PLAYBOOK.md) ([PDF](docs/playbook.pdf)), eight measured rules for maintainers.
+> Companion paper: *Fixing the Context Didn't Fix the Agent*, with its playbook [Before You Trust the Pass Rate](docs/eval_playbook.pdf) (PDF), nine measured rules for building and evaluating a small coding agent.
 
 <p align="center"><img src="docs/architecture.svg" alt="Animated architecture: one offline Gemma 4 triage agent investigates the issue and writes notes, a reproduction script and a trace; a deterministic orchestrator checks them in five steps (fallback, retrieval, agreement confidence, call-graph tests, re-running the reproduction) and fills the report the maintainer decides on." width="100%"></p>
 
@@ -79,7 +80,7 @@ run is deterministic.
 | `tests/` | Self-contained tests (`python -m pytest tests`) |
 | `notebooks/` | `make_demo_notebook.py` builds the [triage-demo](https://www.kaggle.com/code/rishikeshbharatkoli/triage-demo) Kaggle notebook: real issues triaged end to end with Gemma 4, printing the maintainer's reports |
 | `eval/` | Rebuild the labels, baselines and every number in the paper from the competition data ([eval/README.md](eval/README.md)) |
-| `docs/` | Architecture, the maintainers' playbook ([PLAYBOOK.md](docs/PLAYBOOK.md), [PDF](docs/playbook.pdf)), figures, example reports |
+| `docs/` | Architecture, the maintainers' playbook ([PLAYBOOK.md](docs/PLAYBOOK.md), [PDF](docs/playbook.pdf)), Paper 1's evaluation playbook ([PDF](docs/eval_playbook.pdf)), figures, example reports |
 
 No competition data, labels or traces are included; the evaluation scripts rebuild them for anyone
 with access to the competition data.
