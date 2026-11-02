@@ -10,6 +10,7 @@
 :root{
   --ink:#1d1e23; --muted:#55575f; --soft:#8b8d95; --line:#e2ded4; --paper:#fbf8f2; --card:#ffffff;
   --blue:#2f5fd0; --blue-bg:#eef2fc; --orange:#e2701b; --orange-bg:#fdf0e4;
+  --mag:#c2378f;
   --high:#2e7d32; --high-bg:#e8f5e9; --med:#b7791f; --med-bg:#fdf5e1; --low:#c0392b; --low-bg:#fdecea;
 }
 @page{size:A4;margin:0}
@@ -18,7 +19,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:Inter,"DejaVu San
   -webkit-print-color-adjust:exact;print-color-adjust:exact}
 .page{width:210mm;height:297mm;padding:15mm 16mm 13mm;position:relative;overflow:hidden;page-break-after:always;background:var(--paper)}
 .page:last-child{page-break-after:auto}
-h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;letter-spacing:-.01em;line-height:1.1;text-wrap:balance}
 h2{font-size:22pt;margin-bottom:2.5mm}
 h3{font-size:11.5pt;margin-bottom:1.2mm}
 .kicker{font-size:7.6pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:2mm}
@@ -78,6 +79,39 @@ pre.light{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 .flow .arr{align-self:center;color:var(--soft);font-size:11pt}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
 ul.tight{padding-left:4.2mm} ul.tight li{margin-bottom:1.3mm}
+/* results: bar table and dumbbell (print, so every value is a direct label) */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:3mm;padding:3.3mm 5mm 3.5mm;margin-bottom:3.2mm}
+.panel h3{font-size:11pt;margin-bottom:.5mm}
+.panel .sub{font-size:8pt;color:var(--muted);margin-bottom:2.2mm}
+.bt{display:grid;grid-template-columns:42mm repeat(3,1fr);column-gap:4mm;row-gap:1.8mm;align-items:center}
+.bt .h,.db .h{font-size:7pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.who{font-size:8.6pt;font-weight:600;display:flex;align-items:center;gap:2mm;line-height:1.2}
+.who small{display:block;font-weight:400;font-size:7.3pt;color:var(--muted)}
+.sw{flex:none;width:2.8mm;height:2.8mm;border-radius:.7mm}
+.cell{display:flex;align-items:center;gap:1.4mm;border-left:1px solid #b9b4a8;height:6.2mm}
+.bar{height:4.4mm;border-radius:0 1mm 1mm 0}
+.val{font-size:8.5pt;color:var(--muted);font-variant-numeric:tabular-nums}
+.val.b{color:var(--ink);font-weight:700}
+.c-ret{background:var(--orange)} .c-ag{background:var(--blue)} .c-all{background:var(--mag)}
+.db{display:grid;grid-template-columns:42mm 1fr 24mm;column-gap:5mm;row-gap:1.2mm;align-items:center}
+.track{position:relative;height:6.2mm;background:repeating-linear-gradient(to right,#e9e4d9 0 1px,transparent 1px 25%);border-right:1px solid #e9e4d9}
+.track .seg{position:absolute;top:50%;height:2px;margin-top:-1px;background:#bdb7aa}
+.track .dot{position:absolute;top:50%;width:3.2mm;height:3.2mm;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #fff}
+.track .dl{position:absolute;top:50%;transform:translateY(-50%);font-size:8pt;color:var(--muted);font-variant-numeric:tabular-nums}
+.track .dl.b{color:var(--ink);font-weight:700}
+.axis{position:relative;height:4mm;font-size:7pt;color:var(--soft)}
+.axis span{position:absolute;transform:translateX(-50%)}
+.key{display:flex;gap:5mm;font-size:8pt;color:var(--muted);margin-bottom:2.4mm}
+.key i{display:inline-block;width:2.8mm;height:2.8mm;border-radius:50%;margin-right:1.4mm;vertical-align:-.4mm}
+.edited{font-size:8.4pt;font-variant-numeric:tabular-nums}
+.costs{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
+.costs .stat{padding:3mm 4mm}
+.costs .stat .n{font-size:15pt}
+/* checklist */
+.check h4{font-size:7.3pt;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:2.6mm 0 1.2mm}
+.check ul{list-style:none}
+.check li{position:relative;padding-left:6mm;margin-bottom:1.5mm;font-size:8.8pt}
+.check li::before{content:"";position:absolute;left:0;top:.5mm;width:3.2mm;height:3.2mm;border:1.3px solid var(--ink);border-radius:.8mm;background:#fff}
 .band{height:46mm;border-radius:3mm;background:url(playbook_spotlight.jpg) center 45%/cover no-repeat;margin-bottom:5mm}
 </style>
 </head>
@@ -157,7 +191,49 @@ ul.tight{padding-left:4.2mm} ul.tight li{margin-bottom:1.3mm}
   <div class="foot"><span>The Triage Playbook</span><span>3</span></div>
 </section>
 
-<!-- 4 · Run it -->
+<!-- 4 · Results -->
+<section class="page">
+  <div class="kicker">What each part adds</div>
+  <h2>Neither half works alone</h2>
+  <p class="lead" style="margin-bottom:3.5mm">Top-1 accuracy on the same issues: model-free retrieval, the Gemma 4 31B agent alone, and the agent inside the orchestrator.</p>
+  <div class="panel"><h3>Right file to fix, ranked first</h3><p class="sub">Retrieval is BM25 with call-graph spreading. §4.1, §4.7</p>
+  <div class="bt">
+    <div></div><div class="h">Dev · 40 issues</div><div class="h">Holdout · 20</div><div class="h">Six other projects · 30</div>
+    <div class="who"><span class="sw c-ret"></span><span>Retrieval alone<small>code only, CPU</small></span></div><div class="cell"><div class="bar c-ret" style="width:calc((100% - 9mm)*0.42)"></div><span class="val">42%</span></div><div class="cell"><div class="bar c-ret" style="width:calc((100% - 9mm)*0.30)"></div><span class="val">30%</span></div><div class="cell"><div class="bar c-ret" style="width:calc((100% - 9mm)*0.40)"></div><span class="val">40%</span></div>
+    <div class="who"><span class="sw c-ag"></span><span>Gemma 4 agent alone<small>its own report</small></span></div><div class="cell"><div class="bar c-ag" style="width:calc((100% - 9mm)*0.75)"></div><span class="val">75%</span></div><div class="cell"><div class="bar c-ag" style="width:calc((100% - 9mm)*0.55)"></div><span class="val">55%</span></div><div class="cell"><div class="bar c-ag" style="width:calc((100% - 9mm)*0.43)"></div><span class="val">43%</span></div>
+    <div class="who"><span class="sw c-all"></span><span>Agent + orchestrator<small>fallback, retrieval, checks</small></span></div><div class="cell"><div class="bar c-all" style="width:calc((100% - 9mm)*0.92)"></div><span class="val b">92%</span></div><div class="cell"><div class="bar c-all" style="width:calc((100% - 9mm)*0.90)"></div><span class="val b">90%</span></div><div class="cell"><div class="bar c-all" style="width:calc((100% - 9mm)*0.83)"></div><span class="val b">83%</span></div>
+  </div></div>
+  <div class="panel"><h3>Right test file, ranked first</h3><p class="sub">Retrieval is BM25 over test files; the orchestrator adds call-graph tests. §4.3, §4.7</p>
+  <div class="bt">
+    <div></div><div class="h">Dev · 40 issues</div><div class="h">Holdout · 20</div><div class="h">Six other projects · 30</div>
+    <div class="who"><span class="sw c-ret"></span><span>Retrieval alone<small>code only, CPU</small></span></div><div class="cell"><div class="bar c-ret" style="width:calc((100% - 9mm)*0.22)"></div><span class="val">22%</span></div><div class="cell"><div class="bar c-ret" style="width:calc((100% - 9mm)*0.50)"></div><span class="val">50%</span></div><div class="cell"><div class="bar c-ret" style="width:calc((100% - 9mm)*0.33)"></div><span class="val">33%</span></div>
+    <div class="who"><span class="sw c-ag"></span><span>Gemma 4 agent alone<small>its own report</small></span></div><div class="cell"><div class="bar c-ag" style="width:calc((100% - 9mm)*0.48)"></div><span class="val">48%</span></div><div class="cell"><div class="bar c-ag" style="width:calc((100% - 9mm)*0.25)"></div><span class="val">25%</span></div><div class="cell"><div class="bar c-ag" style="width:calc((100% - 9mm)*0.37)"></div><span class="val">37%</span></div>
+    <div class="who"><span class="sw c-all"></span><span>Agent + orchestrator<small>agent's tests + call graph</small></span></div><div class="cell"><div class="bar c-all" style="width:calc((100% - 9mm)*0.65)"></div><span class="val b">65%</span></div><div class="cell"><div class="bar c-all" style="width:calc((100% - 9mm)*0.55)"></div><span class="val b">55%</span></div><div class="cell"><div class="bar c-all" style="width:calc((100% - 9mm)*0.63)"></div><span class="val b">63%</span></div>
+  </div></div>
+  <div class="note blue" style="margin:-.6mm 0 3.2mm">On other projects the agent alone barely beat retrieval (43% against 40%) because it wrote a report on only 13 of 30 issues. On 16 others, the files it had opened were right 12 times: the fallback chain turned what it had seen into <b>83%</b>.</div>
+
+  <div class="panel"><h3>Choosing a model: the checks matter more for a small one</h3><p class="sub">Right file first, same 60 issues and budgets. Gemma 4 E4B (4-bit) runs on one L4. §4.8</p>
+  <div class="key"><span><i class="c-ag"></i>Agent alone</span><span><i class="c-all"></i>Agent + orchestrator</span></div>
+  <div class="db">
+    <div></div><div></div><div class="h">Edited source</div>
+    <div class="who">Gemma 4 31B · dev</div><div class="track"><div class="seg" style="left:75%;width:17%"></div><span class="dl" style="right:calc(25% + 2.6mm)">75%</span><div class="dot c-ag" style="left:75%"></div><div class="dot c-all" style="left:92%"></div><span class="dl b" style="left:calc(92% + 2.6mm)">92%</span></div><div class="edited">0 of 40</div>
+    <div class="who">Gemma 4 31B · holdout</div><div class="track"><div class="seg" style="left:55%;width:35%"></div><span class="dl" style="right:calc(45% + 2.6mm)">55%</span><div class="dot c-ag" style="left:55%"></div><div class="dot c-all" style="left:90%"></div><span class="dl b" style="left:calc(90% + 2.6mm)">90%</span></div><div class="edited">0 of 20</div>
+    <div class="who">Gemma 4 E4B · dev</div><div class="track"><div class="seg" style="left:28%;width:34%"></div><span class="dl" style="right:calc(72% + 2.6mm)">28%</span><div class="dot c-ag" style="left:28%"></div><div class="dot c-all" style="left:62%"></div><span class="dl b" style="left:calc(62% + 2.6mm)">62%</span></div><div class="edited"><b>15 of 40</b></div>
+    <div class="who">Gemma 4 E4B · holdout</div><div class="track"><div class="seg" style="left:35%;width:25%"></div><span class="dl" style="right:calc(65% + 2.6mm)">35%</span><div class="dot c-ag" style="left:35%"></div><div class="dot c-all" style="left:60%"></div><span class="dl b" style="left:calc(60% + 2.6mm)">60%</span></div><div class="edited"><b>3 of 20</b></div>
+    <div></div><div class="axis"><span style="left:0">0%</span><span style="left:25%">25%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span></div><div></div>
+  </div>
+  <p style="font-size:8.2pt;color:var(--muted);margin-top:1.5mm">E4B alone does worse than retrieval; the orchestrator doubles it, and its HIGH reports were right 11 of 12 times. It also ignored the prompt's ban on edits, so mount the source read-only.</p></div>
+
+  <div class="costs">
+    <div class="stat"><div class="n">4.3–5.4 min</div><div class="l">median per issue for the agent: Gemma 4 31B, 4-bit, vLLM on 4×L4</div></div>
+    <div class="stat"><div class="n">0.1 s</div><div class="l">per issue for retrieval on a CPU. With no GPU at all you still get a LOW-confidence first look</div></div>
+    <div class="stat"><div class="n">Seconds</div><div class="l">to build a code graph for any Python repository, once (standard library only)</div></div>
+  </div>
+  <p style="margin-top:2.4mm;font-size:7.6pt;color:var(--soft)">Dev and holdout: the competition's repositories (FastAPI, Rich, Requests, HTTPX). The orchestrator's rules were chosen after seeing both; the six other projects (SWE-bench Verified: Django, SymPy, Sphinx, xarray, pytest, pylint), run with everything frozen, are its clean test.</p>
+  <div class="foot"><span>The Triage Playbook</span><span>4</span></div>
+</section>
+
+<!-- 5 · Run it -->
 <section class="page">
   <div class="kicker">Run it on your repository</div>
   <h2>Three steps, and the first needs no GPU</h2>
@@ -199,10 +275,10 @@ python eval/make_ext_tasks_notebook.py --owner &lt;kaggle_user&gt;</pre>
     --graph graph.json --trace trace.json   <span class="c"># the trace gives the opened-files fallback</span></pre>
     <div class="note">Without <code>--no-repro</code> the orchestrator <b>executes the script the agent wrote</b>. Run this step inside the same sandbox as the agent: no network, source read-only.</div>
   </div></div>
-  <div class="foot"><span>The Triage Playbook</span><span>4</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>5</span></div>
 </section>
 
-<!-- 5 · Reading a report -->
+<!-- 6 · Reading a report -->
 <section class="page">
   <div class="kicker">Reading a report</div>
   <h2>What to do with each label</h2>
@@ -218,10 +294,10 @@ python eval/make_ext_tasks_notebook.py --owner &lt;kaggle_user&gt;</pre>
     <tr><td class="k">NOT_REPRODUCED</td><td>In 11 of 20, the script printed the bug but forgot to <code>assert</code></td><td>Read its output. The location and tests are still useful.</td></tr>
   </table>
   <p style="margin-top:3mm;font-size:8.2pt;color:var(--muted)">HIGH, MEDIUM and LOW counts are from the first run on 60 issues (§4.5) and the 30 outside issues (§4.7). In a second run on the same 60 issues, HIGH or MEDIUM was wrong once in 29 (§4.9).</p>
-  <div class="foot"><span>The Triage Playbook</span><span>5</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>6</span></div>
 </section>
 
-<!-- 6 · CI and calibration -->
+<!-- 7 · CI, calibration, checklist -->
 <section class="page">
   <div class="band" role="img" aria-label="A robot with a clipboard, its toolbox set aside, looks at a call graph lit by a lamp, one node highlighted"></div>
   <div class="kicker">Putting it to work</div>
@@ -243,23 +319,37 @@ python eval/make_ext_tasks_notebook.py --owner &lt;kaggle_user&gt;</pre>
         <li>Label each the way the paper did: the location is the non-test files the fix changed; the tests are the test files its new tests went into (§2).</li>
         <li>Triage them at the fix's parent commit and count how often HIGH and MEDIUM were right. Then decide what each label should trigger.</li>
       </ul>
-    </div>
-    <div>
-      <h3>Choosing a model</h3>
+      <h3 style="margin-top:4mm">Known limits</h3>
       <ul class="tight">
-        <li><b>Gemma 4 31B, 4-bit</b> on 4×L4: the numbers in this playbook.</li>
-        <li><b>Gemma 4 E4B</b> on one L4: with the orchestrator, right file first 62% · 60% (alone 28% · 35%), but it edited source in 18 of 60 runs. Read-only is not optional. <span class="ref">§4.8</span></li>
-        <li>Retrieval alone, on a laptop: 42% · 30%. A first look, always LOW.</li>
-      </ul>
-      <h3 style="margin-top:3.5mm">Known limits</h3>
-      <ul class="tight">
-        <li>Small samples; Python only.</li>
+        <li>Small samples: 60 issues run twice, 30 run once.</li>
+        <li>Python only.</li>
         <li>Labels come from one merged fix: another valid location counts as wrong.</li>
+      </ul>
+    </div>
+    <div class="check">
+      <h3>Deployment checklist</h3>
+      <h4>Sandbox</h4>
+      <ul>
+        <li>Source mounted read-only; only <code>TRIAGE/</code> is writable. <span class="ref">Play 7</span></li>
+        <li>No network; <code>repro.py</code> runs only inside the sandbox.</li>
+        <li>24 tool calls and 8 minutes; the report is written by call 14. <span class="ref">Play 2</span></li>
+      </ul>
+      <h4>Report</h4>
+      <ul>
+        <li>Confidence comes from agreement with retrieval, never from the model. <span class="ref">Play 4</span></li>
+        <li>REPRODUCED comes only from the script's exit code. <span class="ref">Play 5</span></li>
+        <li>Each report shows its source and retrieval's top 3.</li>
+      </ul>
+      <h4>Process</h4>
+      <ul>
+        <li>Calibrated on 20 to 40 of your closed issues.</li>
+        <li>The bot comments and labels. It never opens a pull request or closes an issue.</li>
+        <li>Re-calibrate after changing the model, the prompt or the budget.</li>
       </ul>
     </div>
   </div>
   <div class="note blue" style="margin-top:4mm">Paper: <i>Triage, Don't Fix</i> (Koli, 2026). Code, evaluation scripts and every number: github.com/Rishikoli/gemma4-issue-triage. Demo: kaggle.com/code/rishikeshbharatkoli/triage-demo.</div>
-  <div class="foot"><span>The Triage Playbook</span><span>6</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>7</span></div>
 </section>
 </body>
 </html>

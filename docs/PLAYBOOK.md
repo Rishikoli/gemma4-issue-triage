@@ -5,7 +5,7 @@ bug is, which tests cover that code and whether it reproduces. It leaves the fix
 
 <p align="center"><img src="playbook_cover.jpg" alt="A clay robot stamps envelopes and sorts them into green, yellow and red trays" width="100%"></p>
 
-Illustrated version: [playbook.pdf](playbook.pdf) (6 pages). Every number comes from the paper
+Illustrated version: [playbook.pdf](playbook.pdf) (7 pages). Every number comes from the paper
 *Triage, Don't Fix* (Koli, 2026); section numbers point to it.
 
 | | |
@@ -47,6 +47,39 @@ Illustrated version: [playbook.pdf](playbook.pdf) (6 pages). Every number comes 
 <p align="center"><img src="architecture.svg" alt="One Gemma 4 triage agent writes notes, a reproduction script and a trace; a deterministic orchestrator checks them in five steps and fills the maintainer's report." width="100%"></p>
 
 Details and measured effect of each step: [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## What each part adds
+
+Neither half works alone. Top-1, Gemma 4 31B; retrieval is BM25 with call-graph spreading for files
+and BM25 over test files for tests (§4.1, §4.3, §4.7).
+
+| | Dev (40) | Holdout (20) | Six other projects (30) |
+|---|---|---|---|
+| Right file: retrieval alone | 42% | 30% | 40% |
+| Right file: agent alone | 75% | 55% | 43% |
+| Right file: **agent + orchestrator** | **92%** | **90%** | **83%** |
+| Right test file: retrieval alone | 22% | 50% | 33% |
+| Right test file: agent alone | 48% | 25% | 37% |
+| Right test file: **agent + orchestrator** | **65%** | **55%** | **63%** |
+
+On other projects the agent alone barely beat retrieval (43% against 40%) because it wrote a report on
+only 13 of 30 issues. On 16 others, the files it had opened were right 12 times: the fallback chain
+turned what it had seen into 83%. The orchestrator's rules were chosen after seeing dev and holdout, so
+the six other projects (SWE-bench Verified, run with everything frozen) are its clean test.
+
+**Choosing a model.** The checks matter more for a small one (right file first, dev / holdout, §4.8):
+
+| | Agent alone | + orchestrator | Runs that edited source |
+|---|---|---|---|
+| Gemma 4 31B, 4-bit, 4×L4 | 75% / 55% | 92% / 90% | 0 of 60 |
+| Gemma 4 E4B, 4-bit, one L4 | 28% / 35% | 62% / 60% | 18 of 60 |
+
+E4B alone does worse than retrieval; the orchestrator doubles it, and its HIGH reports were right 11 of
+12 times. It also ignored the prompt's ban on edits, so mount the source read-only.
+
+**Cost per issue.** The agent: a median 4.3 to 5.4 minutes (31B on 4×L4). Retrieval: 0.1 s on a CPU,
+and with no GPU at all you still get a LOW-confidence first look. The code graph: seconds, once per
+repository.
 
 ## Run it on your repository
 
@@ -112,14 +145,25 @@ own history first: take 20 to 40 closed issues with a merged fix, label each the
 location is the non-test files the fix changed; the tests are the test files its new tests went into),
 triage them at the fix's parent commit, and count how often HIGH and MEDIUM were right.
 
-**Choosing a model.**
-- Gemma 4 31B, 4-bit, on 4×L4: the numbers above.
-- Gemma 4 E4B on one L4: with the orchestrator, right file first 62% / 60% (alone 28% / 35%), but it
-  edited source in 18 of 60 runs. Read-only is not optional (§4.8).
-- Retrieval alone, on a laptop: 42% / 30%. A first look, always LOW.
+**Known limits.** Small samples (60 issues run twice, 30 run once); Python only; labels come from one
+merged fix, so another valid location counts as wrong.
 
-**Known limits.** Small samples; Python only; labels come from one merged fix, so another valid location
-counts as wrong.
+### Deployment checklist
+
+Sandbox
+- [ ] Source mounted read-only; only `TRIAGE/` is writable (play 7).
+- [ ] No network; `repro.py` runs only inside the sandbox.
+- [ ] 24 tool calls and 8 minutes; the report is written by call 14 (play 2).
+
+Report
+- [ ] Confidence comes from agreement with retrieval, never from the model (play 4).
+- [ ] REPRODUCED comes only from the script's exit code (play 5).
+- [ ] Each report shows its source and retrieval's top 3.
+
+Process
+- [ ] Calibrated on 20 to 40 of your closed issues.
+- [ ] The bot comments and labels. It never opens a pull request or closes an issue.
+- [ ] Re-calibrate after changing the model, the prompt or the budget.
 
 ---
 
