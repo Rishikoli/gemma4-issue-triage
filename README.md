@@ -43,7 +43,22 @@ and the runs listed below used the orchestrator frozen, so they are its clean te
 - **Gemma 4 E4B** on one L4: the orchestrator lifts it from 28% / 35% to 62% / 60% right file, but E4B
   edited source code in 18 of 60 runs (31B: once in 150 single-agent runs). Mount the source read-only.
 
-[eval/README.md](eval/README.md) maps every number in the paper to the script that rebuilds it.
+## Reproduce the paper
+
+Competition data may not be redistributed, so this repository ships the scripts that rebuild every
+number, not their outputs. You need a Kaggle account that has joined the competition.
+
+| Step | Runs on | Time | Paper |
+|---|---|---|---|
+| Data, split, labels, retrieval baselines (`eval/make_split.py`, `triage_labels.py`, `triage_localize.py`) | laptop, CPU | a few minutes | Table 1 retrieval rows, Table 2 |
+| Agent runs (`notebooks/make_demo_notebook.py --subset dev`, or `holdout`; two agents, E4B and outside issues by flag) | Kaggle, 4×L4 | about 1 h per 40 issues | every agent row, §4.6–4.9 |
+| Reproduction check (`eval/make_repro_check_notebook.py`) | Kaggle, CPU | about 5 minutes | §4.4 |
+| Outside issues: snapshots and graphs (`eval/make_ext_tasks_notebook.py`) | Kaggle, CPU | about 20 minutes | §4.7 |
+| Scoring (`triage_reports.py`, `triage_pipeline.py`, `paper_stats.py`) | laptop, CPU | under 20 seconds | Tables 1–2, §4.1–4.9, McNemar tests, 73 of 74 |
+
+Every command, and the script behind each number: [eval/README.md](eval/README.md). Agent sampling is
+not seeded, so new runs give numbers like ours rather than identical ones; every step after the agent
+run is deterministic.
 
 ## What you get per issue
 
