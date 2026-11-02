@@ -11,8 +11,9 @@ embeddings only switch on the harness's graph-tool prompt; the triage agent neve
 Usage:
     python eval/make_ext_tasks_notebook.py --owner <kaggle_user>     # writes results/ext/tasks.jsonl too
     kaggle kernels push -p notebooks/gemma4-ext-tasks
-Then run the agent on them (gemma4-agent: scripts/make_kaggle_notebook.py --ext-data <kaggle_user>/gemma4-ext-tasks
---ext-tasks results/ext/tasks.jsonl ...) and score with --tasks/--graphs pointing at that output.
+Then run the agent on them (python notebooks/make_demo_notebook.py --owner <kaggle_user> --ext-data
+<kaggle_user>/gemma4-ext-tasks --run-name triage_ext_r1 --slug triage-run) and score with --tasks/--graphs
+pointing at that output.
 """
 from __future__ import annotations
 

@@ -43,6 +43,21 @@ Each run of an agent in the competition harness (Kaggle, Gemma 4 4-bit on vLLM) 
 | `triage_e4b_dev_r1`, `triage_e4b_hold_r1` | `agent/` with `model: gemma-4-e4b-it-qat-w4a16-ct`, one L4 | the same 60 | §4.8 |
 | `triage_dev_r2`, `triage_hold_r2` | `agent/`, 31B, run again | the same 60 | §4.9 |
 
+Each run is one Kaggle notebook built by `notebooks/make_demo_notebook.py`, the same notebook as the
+public demo, with the paper's issue order (round-robin across repositories) and four issues at a time:
+
+```bash
+python notebooks/make_demo_notebook.py --owner <kaggle_user> --subset dev --run-name triage_dev_r1 --slug triage-run
+kaggle kernels push -p notebooks/triage-run                     # GPU: about 1 h on 4×L4 for 40 issues
+kaggle kernels output <kaggle_user>/triage-run -p results/triage_dev_r1
+```
+
+Holdout: `--subset holdout`. Two agents: `--agent agent_multi`. E4B: `--model gemma-4-e4b-it-qat-w4a16-ct
+--gpus 1`. Outside issues: `--ext-data <kaggle_user>/gemma4-ext-tasks` (section 5). Kaggle charges L4 time
+double, so a 40-issue run costs about 2 h of the 30-hour weekly GPU quota. Sampling is not seeded: a new
+run gives numbers like the paper's, not identical ones (§4.9 measures the spread). Everything after the
+agent run is deterministic.
+
 ## 4. Scoring the agent and the orchestrator
 
 ```bash
@@ -95,8 +110,8 @@ python eval/triage_pipeline.py triage_ext_r1 "${E[@]}" --labels results/triage/l
     --retrieval results/triage/localize_ext.jsonl --out-dir results/triage/pipeline_ext
 ```
 
-The agent run `triage_ext_r1` is the harness with `--ext-data <kaggle_user>/gemma4-ext-tasks` (see the
-docstring of `make_ext_tasks_notebook.py`). There is no repro check for these issues: each project needs
+The agent run `triage_ext_r1` comes from `python notebooks/make_demo_notebook.py --owner <kaggle_user>
+--ext-data <kaggle_user>/gemma4-ext-tasks --run-name triage_ext_r1 --slug triage-run` (section 3). There is no repro check for these issues: each project needs
 its own environment.
 
 The repro check runs every `TRIAGE/repro.py` before and after the reference fix. It uses the same
