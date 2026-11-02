@@ -5,7 +5,7 @@ bug is, which tests cover that code and whether it reproduces. It leaves the fix
 
 <p align="center"><img src="playbook_cover.jpg" alt="A clay robot stamps envelopes and sorts them into green, yellow and red trays" width="100%"></p>
 
-Illustrated version: [playbook.pdf](playbook.pdf) (7 pages). Every number comes from the paper
+Illustrated version: [playbook.pdf](playbook.pdf) (11 pages). Every number comes from the paper
 *Triage, Don't Fix* (Koli, 2026); section numbers point to it.
 
 | | |
@@ -41,6 +41,36 @@ Illustrated version: [playbook.pdf](playbook.pdf) (7 pages). Every number comes 
 
 > **The rule behind all eight:** let the model look, let code decide what the maintainer sees, and let
 > the maintainer fix.
+
+## The plays in pictures
+
+<p align="center"><img src="playbook_img/timeline.jpg" alt="Timeline from issue opened to maintainer decides: Gemma 4 triage takes a median 4.3 to 5.4 minutes and writes a report card; no fix is written." width="100%"></p>
+
+**Play 1.** Three answers and a confidence level in about five minutes, offline. No fix. Percentages are dev / holdout (§1, §4.1, §4.3).
+
+<p align="center"><img src="playbook_img/river.jpg" alt="Flow diagram: of 60 issues, the agent wrote 43 reports (41 right first); for the 17 where it ran out of budget, the first file it opened was right 14 times (retrieval alone: 7); 55 of 60 right overall." width="100%"></p>
+
+**Plays 2 and 3.** When the agent runs out of budget, the first file it opened becomes the report. That fallback is where the orchestrator's location gain comes from (§4.4).
+
+<p align="center"><img src="playbook_img/two_witnesses.jpg" alt="Venn diagram of the agent's pick and model-free retrieval: HIGH 16 of 16, MEDIUM 13 of 13, LOW 26 of 31; HIGH or MEDIUM right 73 of 74 times across three runs." width="100%"></p>
+
+**Play 4.** Confidence comes from agreement with model-free retrieval. Asked directly, the agent rated every report HIGH (§4.5, §4.7, §4.9).
+
+<p align="center"><img src="playbook_img/truth_table.jpg" alt="56 reproduction scripts: 22 verified, 20 pass on the buggy code, 14 still fail with the fix; the agent's 'reproduced' held up 44% of the time, a non-zero exit code 61%." width="100%"></p>
+
+**Play 5.** The orchestrator re-runs the agent's script and reports REPRODUCED only from its exit code (§4.4).
+
+<p align="center"><img src="playbook_img/relay_race.jpg" alt="One agent against a localizer handing off to a reproducer, same 8-minute, 24-call budget: time-limit hits 5 vs 20, right test file 62% vs 50%, wrote outside its folder 0 vs 6." width="100%"></p>
+
+**Play 8.** Same budget, two agents: the first one rarely stopped in time to hand over (§4.6).
+
+<p align="center"><img src="playbook_img/two_lanes.jpg" alt="Right file first with and without the checks: Gemma 4 31B 75% to 92% and 55% to 90%; Gemma 4 E4B 28% to 62% and 35% to 60%, and it edited source code in 18 of 60 runs." width="100%"></p>
+
+**Play 7.** The small model gains most from the checks, and ignores the prompt's ban on edits. Enforce read-only in the sandbox (§4.8).
+
+<p align="center"><img src="playbook_img/islands.jpg" alt="From the competition repositories to Django, SymPy, Sphinx, xarray, pytest and pylint, 5 issues each: retrieval 40%, agent alone 43%, agent with checks 83%; top 3: 93%." width="100%"></p>
+
+**Other projects.** 30 SWE-bench Verified issues, with the agent, prompt and orchestrator frozen: its clean test (§4.7).
 
 ## How it works
 

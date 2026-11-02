@@ -112,6 +112,15 @@ ul.tight{padding-left:4.2mm} ul.tight li{margin-bottom:1.3mm}
 .check ul{list-style:none}
 .check li{position:relative;padding-left:6mm;margin-bottom:1.5mm;font-size:8.8pt}
 .check li::before{content:"";position:absolute;left:0;top:.5mm;width:3.2mm;height:3.2mm;border:1.3px solid var(--ink);border-radius:.8mm;background:#fff}
+/* picture pages */
+.pic{margin:0 0 5mm}
+.pic img{width:100%;display:block;border-radius:2.5mm;border:1px solid var(--line)}
+.pic figcaption{display:flex;gap:3mm;align-items:baseline;font-size:8.8pt;color:var(--muted);margin-top:2mm;line-height:1.4}
+.pic figcaption b{color:var(--ink);white-space:nowrap}
+.pic figcaption .ref{margin-left:auto}
+.sources{background:var(--card);border:1px solid var(--line);border-radius:3mm;padding:4mm 5mm}
+.sources h3{margin-bottom:2mm}
+.sources ul{padding-left:4.2mm;font-size:8.8pt} .sources li{margin-bottom:1.2mm}
 .band{height:46mm;border-radius:3mm;background:url(playbook_spotlight.jpg) center 45%/cover no-repeat;margin-bottom:5mm}
 </style>
 </head>
@@ -172,7 +181,52 @@ ul.tight{padding-left:4.2mm} ul.tight li{margin-bottom:1.3mm}
   <div class="foot"><span>The Triage Playbook</span><span>2</span></div>
 </section>
 
-<!-- 3 · How it works -->
+<!-- 3 · Pictures -->
+<section class="page">
+  <div class="kicker">The plays in pictures · 1 of 4</div>
+  <h2 style="font-size:19pt;margin-bottom:4mm">What the maintainer gets, and where it comes from</h2>
+  <figure class="pic"><img src="playbook_img/timeline.jpg" alt="Timeline from issue opened to maintainer decides: Gemma 4 triage takes a median 4.3 to 5.4 minutes and writes a report card with the suspected file, tests to run, a checked reproduction script and a confidence level; no fix is written."><figcaption><b>Play 1</b><span>Three answers and a confidence level in about five minutes, offline. No fix. Percentages are dev / holdout.</span><span class="ref">§1, §4.1, §4.3</span></figcaption></figure>
+  <figure class="pic"><img src="playbook_img/river.jpg" alt="Flow diagram: of 60 issues, the agent wrote a report for 43 (41 had the right file first); 17 ran out of budget, and the first file it had opened was right for 14 of them (retrieval alone: 7 of 17); 55 of 60 right overall."><figcaption><b>Plays 2 and 3</b><span>When the agent runs out of budget, the first file it opened becomes the report. That fallback is where the orchestrator's location gain comes from.</span><span class="ref">§4.4</span></figcaption></figure>
+  <div class="foot"><span>The Triage Playbook</span><span>3</span></div>
+</section>
+
+<!-- 4 · Pictures -->
+<section class="page">
+  <div class="kicker">The plays in pictures · 2 of 4</div>
+  <h2 style="font-size:19pt;margin-bottom:4mm">Let code decide what the maintainer sees</h2>
+  <figure class="pic"><img src="playbook_img/two_witnesses.jpg" alt="Venn diagram of the agent's pick and model-free retrieval: where they agree, HIGH confidence, right 16 of 16; MEDIUM 13 of 13; LOW 26 of 31; HIGH or MEDIUM right 73 of 74 times across three runs. Asked directly, the agent rated every report HIGH."><figcaption><b>Play 4</b><span>Confidence comes from agreement with model-free retrieval. Asked directly, the agent rated every report HIGH.</span><span class="ref">§4.5, §4.7, §4.9</span></figcaption></figure>
+  <figure class="pic"><img src="playbook_img/truth_table.jpg" alt="The agent's 56 reproduction scripts sorted into three boxes: 22 fail on the buggy code and pass with the real fix (verified), 20 pass on the buggy code, 14 still fail with the fix. The agent's own 'reproduced' held up 44% of the time; a non-zero exit code held up 61%."><figcaption><b>Play 5</b><span>The orchestrator re-runs the agent's script and reports REPRODUCED only from its exit code.</span><span class="ref">§4.4</span></figcaption></figure>
+  <div class="foot"><span>The Triage Playbook</span><span>4</span></div>
+</section>
+
+<!-- 5 · Pictures -->
+<section class="page">
+  <div class="kicker">The plays in pictures · 3 of 4</div>
+  <h2 style="font-size:19pt;margin-bottom:4mm">Keep the agent simple, and sandbox it</h2>
+  <figure class="pic"><img src="playbook_img/relay_race.jpg" alt="Relay race with the same 8-minute, 24-call finish line: one agent against a localizer handing off to a reproducer. Runs that hit the time limit 5 vs 20, right test file first 62% vs 50%, wrote outside its folder 0 vs 6."><figcaption><b>Play 8</b><span>Same budget, two agents: the first one rarely stopped in time to hand over.</span><span class="ref">§4.6</span></figcaption></figure>
+  <figure class="pic"><img src="playbook_img/two_lanes.jpg" alt="Gemma 4 31B on 4 GPUs: right file first 75% to 92% on dev and 55% to 90% on holdout with the checks. Gemma 4 E4B on 1 GPU: 28% to 62% and 35% to 60%; it edited source code in 18 of 60 runs despite the prompt."><figcaption><b>Play 7</b><span>The small model gains most from the checks, and ignores the prompt's ban on edits. Enforce read-only in the sandbox.</span><span class="ref">§4.8</span></figcaption></figure>
+  <div class="foot"><span>The Triage Playbook</span><span>5</span></div>
+</section>
+
+<!-- 6 · Pictures -->
+<section class="page">
+  <div class="kicker">The plays in pictures · 4 of 4</div>
+  <h2 style="font-size:19pt;margin-bottom:4mm">It carried over, unchanged</h2>
+  <figure class="pic"><img src="playbook_img/islands.jpg" alt="Map: from the competition repositories (FastAPI, Rich, Requests, HTTPX) to six other projects, Django, SymPy, Sphinx, xarray, pytest and pylint, 5 issues each. Right file first: retrieval 40%, agent alone 43%, agent with checks 83%; top 3: 93%; nothing retuned."><figcaption><b>Other projects</b><span>30 SWE-bench Verified issues, with the agent, prompt and orchestrator frozen: its clean test.</span><span class="ref">§4.7</span></figcaption></figure>
+  <div class="sources">
+    <h3>Where every number comes from</h3>
+    <ul>
+      <li><b>60 competition issues</b> (40 dev, 20 holdout) from FastAPI, Rich, Requests and HTTPX, triaged by Gemma 4 31B (4-bit) twice. The second run: right file first 88% / 95%, right test file 55% / 55%, and HIGH or MEDIUM wrong once in 29. <span class="ref">§4.9</span></li>
+      <li><b>30 issues from six other projects</b>, run once with everything frozen. <span class="ref">§4.7</span></li>
+      <li><b>Gemma 4 E4B</b> and the <b>two-agent variant</b>: one run each on the same 60 issues. <span class="ref">§4.6, §4.8</span></li>
+      <li><b>Labels</b> come from the merged fix: the non-test files it changed, and the test files its new tests went into. Another valid location counts as wrong. <span class="ref">§2</span></li>
+      <li>The agent's prompt was written from dev issues only; the orchestrator's rules were chosen after seeing dev and holdout. <span class="ref">§6</span></li>
+    </ul>
+  </div>
+  <div class="foot"><span>The Triage Playbook</span><span>6</span></div>
+</section>
+
+<!-- 7 · How it works -->
 <section class="page">
   <div class="kicker">How it works</div>
   <h2>One agent investigates. Code decides what you see.</h2>
@@ -188,10 +242,10 @@ ul.tight{padding-left:4.2mm} ul.tight li{margin-bottom:1.3mm}
     <tr><td class="k"><span class="pill o">5 Repro</span></td><td>Runs the agent's script. A non-zero exit on the current code means REPRODUCED.</td><td>Precision 44% → 61%</td></tr>
   </table>
   <p style="margin-top:3mm;font-size:8.4pt;color:var(--muted)">Dev · holdout figures are 40 · 20 issues from the competition's repositories. The code graph can be the competition's or one built with Python's <code>ast</code> in a few seconds; with ours, the system got the same 55 files and 37 test files right, issue for issue. <span class="ref">§4.2</span></p>
-  <div class="foot"><span>The Triage Playbook</span><span>3</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>7</span></div>
 </section>
 
-<!-- 4 · Results -->
+<!-- 8 · Results -->
 <section class="page">
   <div class="kicker">What each part adds</div>
   <h2>Neither half works alone</h2>
@@ -230,10 +284,10 @@ ul.tight{padding-left:4.2mm} ul.tight li{margin-bottom:1.3mm}
     <div class="stat"><div class="n">Seconds</div><div class="l">to build a code graph for any Python repository, once (standard library only)</div></div>
   </div>
   <p style="margin-top:2.4mm;font-size:7.6pt;color:var(--soft)">Dev and holdout: the competition's repositories (FastAPI, Rich, Requests, HTTPX). The orchestrator's rules were chosen after seeing both; the six other projects (SWE-bench Verified: Django, SymPy, Sphinx, xarray, pytest, pylint), run with everything frozen, are its clean test.</p>
-  <div class="foot"><span>The Triage Playbook</span><span>4</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>8</span></div>
 </section>
 
-<!-- 5 · Run it -->
+<!-- 9 · Run it -->
 <section class="page">
   <div class="kicker">Run it on your repository</div>
   <h2>Three steps, and the first needs no GPU</h2>
@@ -275,10 +329,10 @@ python eval/make_ext_tasks_notebook.py --owner &lt;kaggle_user&gt;</pre>
     --graph graph.json --trace trace.json   <span class="c"># the trace gives the opened-files fallback</span></pre>
     <div class="note">Without <code>--no-repro</code> the orchestrator <b>executes the script the agent wrote</b>. Run this step inside the same sandbox as the agent: no network, source read-only.</div>
   </div></div>
-  <div class="foot"><span>The Triage Playbook</span><span>5</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>9</span></div>
 </section>
 
-<!-- 6 · Reading a report -->
+<!-- 10 · Reading a report -->
 <section class="page">
   <div class="kicker">Reading a report</div>
   <h2>What to do with each label</h2>
@@ -294,10 +348,10 @@ python eval/make_ext_tasks_notebook.py --owner &lt;kaggle_user&gt;</pre>
     <tr><td class="k">NOT_REPRODUCED</td><td>In 11 of 20, the script printed the bug but forgot to <code>assert</code></td><td>Read its output. The location and tests are still useful.</td></tr>
   </table>
   <p style="margin-top:3mm;font-size:8.2pt;color:var(--muted)">HIGH, MEDIUM and LOW counts are from the first run on 60 issues (§4.5) and the 30 outside issues (§4.7). In a second run on the same 60 issues, HIGH or MEDIUM was wrong once in 29 (§4.9).</p>
-  <div class="foot"><span>The Triage Playbook</span><span>6</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>10</span></div>
 </section>
 
-<!-- 7 · CI, calibration, checklist -->
+<!-- 11 · CI, calibration, checklist -->
 <section class="page">
   <div class="band" role="img" aria-label="A robot with a clipboard, its toolbox set aside, looks at a call graph lit by a lamp, one node highlighted"></div>
   <div class="kicker">Putting it to work</div>
@@ -349,7 +403,7 @@ python eval/make_ext_tasks_notebook.py --owner &lt;kaggle_user&gt;</pre>
     </div>
   </div>
   <div class="note blue" style="margin-top:4mm">Paper: <i>Triage, Don't Fix</i> (Koli, 2026). Code, evaluation scripts and every number: github.com/Rishikoli/gemma4-issue-triage. Demo: kaggle.com/code/rishikeshbharatkoli/triage-demo.</div>
-  <div class="foot"><span>The Triage Playbook</span><span>7</span></div>
+  <div class="foot"><span>The Triage Playbook</span><span>11</span></div>
 </section>
 </body>
 </html>
