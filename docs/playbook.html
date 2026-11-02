@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Triage Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- Source of docs/playbook.pdf: google-chrome --headless=new --no-pdf-header-footer --virtual-time-budget=15000 --print-to-pdf=docs/playbook.pdf docs/playbook.html -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=block" rel="stylesheet">
+<style>
+:root{
+  --ink:#1d1e23; --muted:#55575f; --soft:#8b8d95; --line:#e2ded4; --paper:#fbf8f2; --card:#ffffff;
+  --blue:#2f5fd0; --blue-bg:#eef2fc; --orange:#e2701b; --orange-bg:#fdf0e4;
+  --high:#2e7d32; --high-bg:#e8f5e9; --med:#b7791f; --med-bg:#fdf5e1; --low:#c0392b; --low-bg:#fdecea;
+}
+@page{size:A4;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-family:Inter,"DejaVu Sans",sans-serif;font-size:9.6pt;line-height:1.45;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;padding:15mm 16mm 13mm;position:relative;overflow:hidden;page-break-after:always;background:var(--paper)}
+.page:last-child{page-break-after:auto}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+h2{font-size:22pt;margin-bottom:2.5mm}
+h3{font-size:11.5pt;margin-bottom:1.2mm}
+.kicker{font-size:7.6pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:2mm}
+.lead{font-size:10.6pt;color:var(--muted);max-width:165mm;margin-bottom:6mm}
+code,.mono{font-family:"JetBrains Mono","Fira Code",monospace;font-size:8.3pt}
+p code,li code,td code{background:#f1ede4;border-radius:3px;padding:0 1.2mm}
+.foot{position:absolute;left:16mm;right:16mm;bottom:8mm;display:flex;justify-content:space-between;font-size:7.4pt;color:var(--soft);border-top:1px solid var(--line);padding-top:2mm}
+.ref{font-size:7.6pt;color:var(--soft);white-space:nowrap}
+.fig{width:100%;border-radius:3mm;border:1px solid var(--line);display:block}
+
+/* cover */
+.cover{padding:0}
+.cover .art{height:150mm;background:url(playbook_cover.jpg) center 42%/cover no-repeat}
+.cover .body{padding:11mm 16mm 0}
+.cover h1{font-size:40pt;margin:1mm 0 4mm}
+.cover .lead{font-size:12pt;max-width:172mm;color:var(--ink);margin-bottom:8mm}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:3mm;padding:4mm 4.5mm}
+.stat .n{font-family:Fraunces,Georgia,serif;font-size:21pt;font-weight:700;line-height:1}
+.stat .l{font-size:8.2pt;color:var(--muted);margin-top:1.8mm;line-height:1.35}
+.cover .foot{bottom:9mm}
+
+/* plays */
+.plays{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
+.play{background:var(--card);border:1px solid var(--line);border-radius:3mm;padding:4.2mm 4.6mm 3.8mm;display:flex;gap:3.6mm}
+.play .num{flex:none;width:8.5mm;height:8.5mm;border-radius:50%;background:var(--ink);color:#fff;font-weight:700;font-size:10pt;display:flex;align-items:center;justify-content:center}
+.play h3{font-size:11pt}
+.play p{font-size:8.7pt;color:var(--muted)}
+.play .ev{margin-top:1.6mm;font-size:8.4pt;color:var(--ink)}
+.play .ev b{color:var(--orange)}
+.play.wide{grid-column:1/3}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:8.6pt}
+th{text-align:left;font-size:7.3pt;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:700;padding:1.6mm 2mm;border-bottom:1.5px solid var(--ink)}
+td{padding:2mm;border-bottom:1px solid var(--line);vertical-align:top}
+td.k{font-weight:600;white-space:nowrap}
+.pill{display:inline-block;font-weight:700;font-size:7.8pt;padding:.5mm 2.2mm;border-radius:10mm}
+.pill.high{background:var(--high-bg);color:var(--high)} .pill.med{background:var(--med-bg);color:var(--med)} .pill.low{background:var(--low-bg);color:var(--low)}
+.pill.g{background:var(--blue-bg);color:var(--blue)} .pill.o{background:var(--orange-bg);color:var(--orange)}
+
+/* steps */
+.step{display:grid;grid-template-columns:24mm 1fr;gap:4mm;margin-bottom:5mm}
+.step .tag{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:15pt;line-height:1.05}
+.step .tag small{display:block;font-family:Inter,sans-serif;font-size:7.4pt;font-weight:600;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;margin-top:1.5mm}
+pre{background:#1d1e23;color:#ecebe7;border-radius:2.5mm;padding:3mm 3.6mm;font-family:"JetBrains Mono","Fira Code",monospace;font-size:7.7pt;line-height:1.5;white-space:pre-wrap;margin:1.8mm 0}
+pre .c{color:#9a9ca4} pre .o{color:#f2b384} pre .b{color:#9db5ec}
+pre.light{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.note{border-left:3px solid var(--orange);background:var(--orange-bg);padding:2.4mm 3.4mm;border-radius:0 2mm 2mm 0;font-size:8.6pt;margin-top:2mm}
+.note.blue{border-color:var(--blue);background:var(--blue-bg)}
+
+/* CI flow */
+.flow{display:flex;align-items:stretch;gap:2mm;margin:2mm 0 5mm}
+.flow .box{flex:1;background:var(--card);border:1px solid var(--line);border-radius:2.5mm;padding:2.6mm 2.8mm;font-size:8pt}
+.flow .box b{display:block;font-size:8.6pt;margin-bottom:.8mm}
+.flow .box.g{border-color:#9db5ec;background:var(--blue-bg)} .flow .box.o{border-color:#f2b384;background:var(--orange-bg)}
+.flow .arr{align-self:center;color:var(--soft);font-size:11pt}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+ul.tight{padding-left:4.2mm} ul.tight li{margin-bottom:1.3mm}
+.band{height:46mm;border-radius:3mm;background:url(playbook_spotlight.jpg) center 45%/cover no-repeat;margin-bottom:5mm}
+</style>
+</head>
+<body>
+
+<!-- 1 · Cover -->
+<section class="page cover">
+  <div class="art" role="img" aria-label="A clay robot stamps envelopes and sorts them into green, yellow and red trays"></div>
+  <div class="body">
+    <div class="kicker">A playbook for maintainers · Gemma 4</div>
+    <h1>Triage, Don't Fix</h1>
+    <p class="lead">Put an offline Gemma 4 agent in front of your issue tracker. For every new issue it says where the bug
+      is, which tests cover that code and whether it reproduces. It leaves the fix to you.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">92% · 90%</div><div class="l">right file to fix ranked first, dev and holdout (60 issues, FastAPI, Rich, Requests, HTTPX)</div></div>
+      <div class="stat"><div class="n">83%</div><div class="l">on 30 SWE-bench Verified issues from six other projects, unchanged (retrieval alone: 40%)</div></div>
+      <div class="stat"><div class="n">73 of 74</div><div class="l">reports labelled HIGH or MEDIUM confidence were right, across three runs</div></div>
+    </div>
+  </div>
+  <div class="foot"><span>From the paper <i>Triage, Don't Fix</i> (Koli, 2026), Gemma 4 Developer Agent Paper Track</span><span>github.com/Rishikoli/gemma4-issue-triage · Apache 2.0</span></div>
+</section>
+
+<!-- 2 · The plays -->
+<section class="page">
+  <div class="kicker">The playbook on one page</div>
+  <h2>Eight plays, each one measured</h2>
+  <p class="lead">Every play below comes from a measurement on real issues, not from a design preference. Section numbers point to the paper.</p>
+  <div class="plays">
+    <div class="play"><div class="num">1</div><div><h3>Ask three questions. Never ask for a fix.</h3>
+      <p>Where is it, which tests cover it, does it reproduce. Fixing is where the model fails.</p>
+      <p class="ev">As a fixing agent, Gemma 4 31B touched the right file in <b>91%</b> of its patches, yet its own final check passed <b>31 of 32</b> wrong fixes. <span class="ref">§1</span></p></div></div>
+    <div class="play"><div class="num">2</div><div><h3>Give it a budget, and make it write early.</h3>
+      <p>24 tool calls and 8 minutes. The report must exist by call 14 and only improves after that.</p>
+      <p class="ev">Its main failure was running out before writing. Even then, the first file it had opened was right <b>14 of 17</b> times. <span class="ref">§4.4</span></p></div></div>
+    <div class="play"><div class="num">3</div><div><h3>Wrap the agent in code that does not trust it.</h3>
+      <p>A fallback chain, model-free retrieval, agreement confidence, call-graph tests and a re-run reproduction. No model calls.</p>
+      <p class="ev">Right file first: <b>75% → 92%</b> on dev, <b>55% → 90%</b> on holdout. Every issue gets a report. <span class="ref">§4.1, §4.4</span></p></div></div>
+    <div class="play"><div class="num">4</div><div><h3>Score confidence by agreement, not by asking.</h3>
+      <p>HIGH: the agent and BM25 + call-graph retrieval pick the same file. MEDIUM: the agent's pick is in retrieval's top 3.</p>
+      <p class="ev">The agent called <b>every</b> report HIGH. Agreement HIGH or MEDIUM was right <b>73 of 74</b> times. <span class="ref">§4.5, §4.7, §4.9</span></p></div></div>
+    <div class="play"><div class="num">5</div><div><h3>Trust the exit code, not the claim.</h3>
+      <p>Run <code>TRIAGE/repro.py</code> yourself. Non-zero on the current code means reproduced, whatever the agent wrote.</p>
+      <p class="ev">"Reproduced" held up against the real fix <b>44% → 61%</b> of the time. <span class="ref">§4.4</span></p></div></div>
+    <div class="play"><div class="num">6</div><div><h3>Find tests through call edges.</h3>
+      <p>Rank test modules by how many calls go from them into the suspected module, then merge them with the agent's own list.</p>
+      <p class="ev">Right test file first: <b>48% → 65%</b> on dev; pooled, <b>13 wins and 0 losses</b>. Embeddings did no better than BM25. <span class="ref">§4.2, §4.3</span></p></div></div>
+    <div class="play"><div class="num">7</div><div><h3>Enforce read-only in the sandbox, not in the prompt.</h3>
+      <p>Mount the source read-only. Only <code>TRIAGE/</code> is writable.</p>
+      <p class="ev">The prompt forbids edits. Gemma 4 E4B still edited source in <b>18 of 60</b> runs, and 31B did so <b>twice in 210</b>. <span class="ref">§4.8, §6</span></p></div></div>
+    <div class="play"><div class="num">8</div><div><h3>Use one agent, not two.</h3>
+      <p>A localizer handing off to a reproducer sounds tidy. A prompt cannot make the first one stop on time.</p>
+      <p class="ev">Same budget: test file <b>62% → 50%</b>, and runs that hit the time limit went from <b>5 to 20</b>. <span class="ref">§4.6</span></p></div></div>
+  </div>
+  <div style="margin-top:7mm;padding:5mm 6mm;border-radius:3mm;background:var(--ink);color:#fff;display:flex;gap:6mm;align-items:center">
+    <div style="font-family:Fraunces,Georgia,serif;font-size:15pt;font-weight:700;line-height:1.15;flex:1.1">The rule behind all eight</div>
+    <div style="flex:2;font-size:9.6pt;line-height:1.5;color:#ecebe7">Let the model <b style="color:#9db5ec">look</b>. Let code <b style="color:#f2b384">decide what the maintainer sees</b>. Let the maintainer <b>fix</b>.</div>
+  </div>
+  <div class="foot"><span>The Triage Playbook</span><span>2</span></div>
+</section>
+
+<!-- 3 · How it works -->
+<section class="page">
+  <div class="kicker">How it works</div>
+  <h2>One agent investigates. Code decides what you see.</h2>
+  <p class="lead">Blue is Gemma 4; orange is deterministic Python. Each check fills one field of the report; the model's own words appear only as its quoted notes.</p>
+  <img class="fig" src="architecture.png" alt="Architecture: one Gemma 4 triage agent writes notes, a reproduction script and a trace; a deterministic orchestrator checks them in five steps and fills the maintainer's report.">
+  <table style="margin-top:5mm">
+    <tr><th style="width:30mm">Step</th><th>What it does</th><th style="width:52mm">Measured</th></tr>
+    <tr><td class="k"><span class="pill g">Agent</span></td><td>Gemma 4 31B, 4-bit, offline. Searches, reads and runs code; writes only <code>TRIAGE/report.md</code> and <code>TRIAGE/repro.py</code>.</td><td>Right file first 75% · 55%; 41 of 43 when it wrote a report</td></tr>
+    <tr><td class="k"><span class="pill o">1 Fallback</span></td><td>The agent's report; else the files it opened, from its trace; else retrieval.</td><td>A report for 60 of 60 issues</td></tr>
+    <tr><td class="k"><span class="pill o">2 Retrieval</span></td><td>BM25 over functions, scores spread along call edges, a module scores as its best function.</td><td>42% · 30% alone, 0.1 s per issue on CPU</td></tr>
+    <tr><td class="k"><span class="pill o">3 Confidence</span></td><td>Agreement of the agent's top file with retrieval (ranks only, no thresholds to tune).</td><td>HIGH or MEDIUM right 73 of 74</td></tr>
+    <tr><td class="k"><span class="pill o">4 Tests</span></td><td>Test modules whose functions call the suspected module, appended to the agent's tests.</td><td>48% · 25% → 65% · 55%</td></tr>
+    <tr><td class="k"><span class="pill o">5 Repro</span></td><td>Runs the agent's script. A non-zero exit on the current code means REPRODUCED.</td><td>Precision 44% → 61%</td></tr>
+  </table>
+  <p style="margin-top:3mm;font-size:8.4pt;color:var(--muted)">Dev · holdout figures are 40 · 20 issues from the competition's repositories. The code graph can be the competition's or one built with Python's <code>ast</code> in a few seconds; with ours, the system got the same 55 files and 37 test files right, issue for issue. <span class="ref">§4.2</span></p>
+  <div class="foot"><span>The Triage Playbook</span><span>3</span></div>
+</section>
+
+<!-- 4 · Run it -->
+<section class="page">
+  <div class="kicker">Run it on your repository</div>
+  <h2>Three steps, and the first needs no GPU</h2>
+  <p class="lead">The orchestrator and the graph builder are plain Python (standard library only). The agent needs a GPU and, today, the competition's harness.</p>
+
+  <div class="step"><div class="tag">1<small>Laptop · seconds</small></div><div>
+    <h3>Build the code graph and get a retrieval-only report</h3>
+    <p>Without the agent you still get ranked suspects and call-graph tests, at LOW confidence: a useful first look.</p>
+<pre><span class="c"># one-time</span>
+git clone https://github.com/Rishikoli/gemma4-issue-triage && cd gemma4-issue-triage
+python -m triage.build_graph /path/to/your/repo --out graph.json
+<span class="c"># per issue: put its title and text in issue.md</span>
+python -m triage.orchestrate --workspace /path/to/your/repo --issue issue.md \
+    --graph graph.json --no-repro      <span class="c"># writes TRIAGE/final_report.md and prints it</span></pre>
+    <p style="font-size:8.4pt;color:var(--muted)">Example, run on this repository with a made-up issue about its own <code>confidence()</code> function (it lives in <code>triage/report.py</code>):</p>
+<pre class="light">graph.json: 99 nodes, 105 edges
+# Triage: confidence() returns LOW when the agent and retrieval agree on the top module
+<b>Confidence: LOW</b> (the agent and retrieval disagree, or the agent named no location)
+## Suspected location
+1. `triage.report`   2. `eval.triage_pipeline`   3. `triage.orchestrate`
+## Tests to run
+- `tests.test_triage`</pre>
+  </div></div>
+
+  <div class="step"><div class="tag">2<small>GPU · ~5 min per issue</small></div><div>
+    <h3>Run the triage agent</h3>
+    <p>The agent is declarative: <code>agent/agent.yaml</code> (Google ADK), the prompt <code>agent/prompts/triage.md</code> and the budget in
+      <code>agent/eval_config.yaml</code> (24 calls, 8 minutes). We ran it only inside the Gemma 4 Developer Agent harness on Kaggle
+      (Gemma 4 31B 4-bit, vLLM, 4×L4; median 4.3 to 5.4 minutes per issue), which needs the competition's data.</p>
+<pre><span class="c"># a Kaggle notebook that triages issues end to end (see the public triage-demo notebook)</span>
+python notebooks/make_demo_notebook.py --owner &lt;kaggle_user&gt;
+<span class="c"># issues from another project: package them as tasks, as the paper did for Django and SymPy</span>
+python eval/make_ext_tasks_notebook.py --owner &lt;kaggle_user&gt;</pre>
+  </div></div>
+
+  <div class="step"><div class="tag">3<small>CPU · seconds</small></div><div>
+    <h3>Turn the agent's notes into the report</h3>
+<pre>python -m triage.orchestrate --workspace /path/to/your/repo --issue issue.md \
+    --graph graph.json --trace trace.json   <span class="c"># the trace gives the opened-files fallback</span></pre>
+    <div class="note">Without <code>--no-repro</code> the orchestrator <b>executes the script the agent wrote</b>. Run this step inside the same sandbox as the agent: no network, source read-only.</div>
+  </div></div>
+  <div class="foot"><span>The Triage Playbook</span><span>4</span></div>
+</section>
+
+<!-- 5 · Reading a report -->
+<section class="page">
+  <div class="kicker">Reading a report</div>
+  <h2>What to do with each label</h2>
+  <p class="lead">A real issue (FastAPI #14458), the report the system produced, and what the maintainers' merged fix did.</p>
+  <img class="fig" src="hero.png" alt="FastAPI issue 14458; the triage report ranks fastapi/dependencies/models.py first with HIGH confidence, lists tests/test_dependency_class.py and a failing reproduction; the merged fix changed that file and added tests to that test file.">
+  <table style="margin-top:5mm">
+    <tr><th style="width:34mm">The report says</th><th style="width:56mm">How often it was right</th><th>What to do</th></tr>
+    <tr><td class="k"><span class="pill high">HIGH</span></td><td>16 of 16 on our issues; 11 of 11 on six other projects</td><td>Start at suspect 1. Run the listed tests before and after your fix.</td></tr>
+    <tr><td class="k"><span class="pill med">MEDIUM</span></td><td>13 of 13; 5 of 5 on other projects</td><td>Start at suspect 1, and keep retrieval's top pick (shown in the report) in view.</td></tr>
+    <tr><td class="k"><span class="pill low">LOW</span></td><td>26 of 31 (84%); 9 of 14 on other projects</td><td>Check first. All five wrong reports were LOW. Compare the three suspects with retrieval's top 3.</td></tr>
+    <tr><td class="k">Source: files the agent opened</td><td>14 of 17 on our issues; 12 of 16 elsewhere</td><td>The agent ran out of budget before writing. Its first file is still a good bet; treat it as LOW.</td></tr>
+    <tr><td class="k">REPRODUCED</td><td>61% held up against the real fix</td><td>Run <code>TRIAGE/repro.py</code>: it should fail now and pass after your fix. If it still fails after a correct fix, its expectation was wrong (14 of 36).</td></tr>
+    <tr><td class="k">NOT_REPRODUCED</td><td>In 11 of 20, the script printed the bug but forgot to <code>assert</code></td><td>Read its output. The location and tests are still useful.</td></tr>
+  </table>
+  <p style="margin-top:3mm;font-size:8.2pt;color:var(--muted)">HIGH, MEDIUM and LOW counts are from the first run on 60 issues (§4.5) and the 30 outside issues (§4.7). In a second run on the same 60 issues, HIGH or MEDIUM was wrong once in 29 (§4.9).</p>
+  <div class="foot"><span>The Triage Playbook</span><span>5</span></div>
+</section>
+
+<!-- 6 · CI and calibration -->
+<section class="page">
+  <div class="band" role="img" aria-label="A robot with a clipboard, its toolbox set aside, looks at a call graph lit by a lamp, one node highlighted"></div>
+  <div class="kicker">Putting it to work</div>
+  <h2>A triage job for every new issue</h2>
+  <p class="lead" style="margin-bottom:3mm">A design sketch: we evaluated the parts, not this deployment.</p>
+  <div class="flow">
+    <div class="box"><b>Issue opened</b>title and text to <code>issue.md</code></div><div class="arr">→</div>
+    <div class="box g"><b>Sandbox + agent</b>source read-only, <code>TRIAGE/</code> writable, no network, 24 calls / 8 min</div><div class="arr">→</div>
+    <div class="box o"><b>Orchestrator</b>fallback, retrieval, confidence, tests, re-run repro</div><div class="arr">→</div>
+    <div class="box"><b>Comment + label</b><code>triage: HIGH</code> / <code>MEDIUM</code> / <code>LOW</code>; never a pull request</div><div class="arr">→</div>
+    <div class="box"><b>Maintainer</b>decides, fixes, closes</div>
+  </div>
+  <div class="cols">
+    <div>
+      <h3>Before you switch it on: calibrate</h3>
+      <p style="margin-bottom:2mm">Our numbers come from 90 issues in 10 projects. Yours may differ, so measure on your own history first.</p>
+      <ul class="tight">
+        <li>Take 20 to 40 closed issues that have a merged fix.</li>
+        <li>Label each the way the paper did: the location is the non-test files the fix changed; the tests are the test files its new tests went into (§2).</li>
+        <li>Triage them at the fix's parent commit and count how often HIGH and MEDIUM were right. Then decide what each label should trigger.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Choosing a model</h3>
+      <ul class="tight">
+        <li><b>Gemma 4 31B, 4-bit</b> on 4×L4: the numbers in this playbook.</li>
+        <li><b>Gemma 4 E4B</b> on one L4: with the orchestrator, right file first 62% · 60% (alone 28% · 35%), but it edited source in 18 of 60 runs. Read-only is not optional. <span class="ref">§4.8</span></li>
+        <li>Retrieval alone, on a laptop: 42% · 30%. A first look, always LOW.</li>
+      </ul>
+      <h3 style="margin-top:3.5mm">Known limits</h3>
+      <ul class="tight">
+        <li>Small samples; Python only.</li>
+        <li>Labels come from one merged fix: another valid location counts as wrong.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note blue" style="margin-top:4mm">Paper: <i>Triage, Don't Fix</i> (Koli, 2026). Code, evaluation scripts and every number: github.com/Rishikoli/gemma4-issue-triage. Demo: kaggle.com/code/rishikeshbharatkoli/triage-demo.</div>
+  <div class="foot"><span>The Triage Playbook</span><span>6</span></div>
+</section>
+</body>
+</html>

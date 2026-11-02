@@ -37,7 +37,8 @@ split, and one agent spends the budget where the issue needs it.
 ## Where it runs
 
 - **Evaluated:** Gemma 4 31B (4-bit) on 4×L4 (Kaggle), served with vLLM, fully offline.
-- **Next:** Gemma 4 E4B on a single L4 (`notebooks/make_demo_notebook.py --model gemma-4-e4b-it-qat-w4a16-ct --gpus 1`), not yet measured.
+- **Also measured:** Gemma 4 E4B on a single L4 (`notebooks/make_demo_notebook.py --model gemma-4-e4b-it-qat-w4a16-ct --gpus 1`):
+  right file first 62% · 60% with the orchestrator (28% · 35% alone), but it edited source code in 18 of 60 runs.
 
 ## Post-training (planned)
 
